@@ -309,7 +309,7 @@
 
     // --- ANIMAL TYPES ---
     const ANIMAL_TYPES = {
-        human: { name: "Sprint on Foot", cost: 0, spd: 6000, acc: 1800, drain: 1.5, reg: 1.5, color: '#ffffff', scale: 1.0, isHuman: true, desc: "Just you, running. No mount." },
+        human: { name: "Sprint on Foot", cost: 0, spd: 1800, acc: 600, drain: 1.5, reg: 1.5, color: '#ffffff', scale: 1.0, isHuman: true, desc: "Just you, running. No mount." },
         horse: { name: "Quarter Horse", cost: 20, spd: 10000, acc: 2000, drain: 3.0, reg: 0.8, color: '#8d6e63', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Balanced speed and stamina." },
         donkey: { name: "Stubborn Donkey", cost: 50, spd: 7500, acc: 1500, drain: 2.0, reg: 1.2, color: '#9e9e9e', scale: 0.8, horns: false, antlers: false, tail: 'thin', desc: "Slow, but rarely gets tired." },
         zebra: { name: "Savannah Zebra", cost: 150, spd: 10500, acc: 2200, drain: 3.0, reg: 0.8, color: '#e0e0e0', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Slightly faster than a horse." },
@@ -621,9 +621,19 @@
         let pStamDrain = Math.max(0.5, anim.drain - (upgrades.stamina * 0.2) + riderInfo.drainBonus);
         let pStamRegen = anim.reg + (upgrades.stamina * 0.1) + riderInfo.regBonus;
 
+        // Scale opponents dynamically to the player's total top speed so races are always competitive
+        // Tournaments have fixed baseline strengths, but we scale them dynamically around the player.
+        // If Custom Race, difficulty multiplier was already applied, but we'll normalize it relative to the player.
+        let ai1BaseSpeed = isCustom ? playerMaxSpeed * (0.95 + (0.10 * customDifficulty)) : playerMaxSpeed * 0.95;
+        let ai2BaseSpeed = isCustom ? playerMaxSpeed * (0.85 + (0.10 * customDifficulty)) : playerMaxSpeed * 0.90;
+
+        // Add a slight variance based on AI's anim spd so they aren't identical
+        ai1BaseSpeed += (ANIMAL_TYPES[tourney.ai[0].anim].spd * 0.1);
+        ai2BaseSpeed += (ANIMAL_TYPES[tourney.ai[1].anim].spd * 0.1);
+
         racers = [
             { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: tourney.ai[0].anim, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor, riderShape: 'normal',
-              y: height - 140, scale: ANIMAL_TYPES[tourney.ai[0].anim].scale * 0.75, dist: 0, speed: 0, maxSpeed: tourney.ai[0].baseSpeed, 
+              y: height - 140, scale: ANIMAL_TYPES[tourney.ai[0].anim].scale * 0.75, dist: 0, speed: 0, maxSpeed: ai1BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: tourney.ai[0].perfChance, finished: false, finishTime: 0 },
             
             { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
@@ -632,7 +642,7 @@
               phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
               
             { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: tourney.ai[1].anim, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor, riderShape: 'normal',
-              y: height - 60, scale: ANIMAL_TYPES[tourney.ai[1].anim].scale * 1.3, dist: 0, speed: 0, maxSpeed: tourney.ai[1].baseSpeed, 
+              y: height - 60, scale: ANIMAL_TYPES[tourney.ai[1].anim].scale * 1.3, dist: 0, speed: 0, maxSpeed: ai2BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: tourney.ai[1].perfChance, finished: false, finishTime: 0 }
         ];
     }

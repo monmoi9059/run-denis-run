@@ -692,7 +692,13 @@
         let playerRacer = racers.find(r => r.isPlayer);
         let anyMoving = false;
 
+        // Dynamic y positioning for responsive resizing
+        let spacing = 40;
+        let baseY = height - 100;
+        let yOffsets = { 'ai1': baseY - spacing, 'player': baseY, 'ai2': baseY + spacing };
+
         racers.forEach(r => {
+            r.y = yOffsets[r.id];
             if (!r.finished) {
                 allFinished = false;
                 
@@ -1038,6 +1044,47 @@
             ctx.beginPath(); ctx.arc(hoofX, hoofY, width * 0.6, 0, Math.PI * 2); ctx.fill();
         }
 
+        function drawIKLimb(startX, startY, endX, endY, len1, len2, width, color, invertKnee = false) {
+            let dx = endX - startX;
+            let dy = endY - startY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Prevent impossible stretch
+            if (dist > len1 + len2) {
+                let ratio = (len1 + len2) / dist;
+                endX = startX + dx * ratio;
+                endY = startY + dy * ratio;
+                dist = len1 + len2;
+            }
+
+            // Law of Cosines
+            let a = len1;
+            let b = len2;
+            let c = dist;
+
+            // Angle of the line connecting start to end
+            let baseAngle = Math.atan2(dy, dx);
+
+            // Angle between base line and first limb segment
+            let acosVal = (a * a + c * c - b * b) / (2 * a * c);
+            acosVal = Math.max(-1, Math.min(1, acosVal)); // clamp
+            let innerAngle = Math.acos(acosVal);
+
+            let jointAngle = invertKnee ? baseAngle - innerAngle : baseAngle + innerAngle;
+
+            let jointX = startX + Math.cos(jointAngle) * a;
+            let jointY = startY + Math.sin(jointAngle) * a;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(jointX, jointY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
         let fb = {u: Math.sin(cycle + Math.PI)*0.6 - 0.2, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*1.2 : 0};
         let nb = {u: Math.sin(cycle + Math.PI + 0.5)*0.6 - 0.2, l: Math.sin(cycle + Math.PI + 0.5)>0 ? Math.sin(cycle + Math.PI + 0.5)*1.2 : 0};
         let ff = {u: Math.sin(cycle)*0.7 + 0.1, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*1.6 : Math.sin(cycle)*0.2};
@@ -1175,33 +1222,92 @@
 
         if (animTypeInfo.isHuman) {
             let runnerX = pX;
-            let runnerY = pY - (20 * s); // Lift up so feet touch ground
-            let runnerCycle = isMoving ? racer.phase * Math.PI * 4 : 0; // Faster cycle for legs
+            let runnerY = pY + (5 * s); // Ground level
 
-            let runnerBounce = isMoving ? Math.abs(Math.sin(runnerCycle)) * 10 * s : 0;
-            let hipY = runnerY - (30 * s) - runnerBounce;
-            let lean = isMoving ? 0.4 + (racer.speed / racer.maxSpeed) * 0.3 : 0.1;
-            let shoulderX = runnerX + Math.sin(lean) * 35 * s * heightMult;
-            let shoulderY = hipY - Math.cos(lean) * 35 * s * heightMult;
+            let sprintSpeed = racer.speed / racer.maxSpeed;
+            // Phase adjustment for rapid footfalls
+            let p1 = (racer.phase * 2) % 1.0;
+            let p2 = (racer.phase * 2 + 0.5) % 1.0;
 
-            // Legs
-            let swing = isMoving ? Math.sin(runnerCycle) * 30 * s : 0;
-            let swingKnee1 = isMoving ? Math.sin(runnerCycle + Math.PI/2) * 15 * s : 0;
-            let swingKnee2 = isMoving ? Math.sin(runnerCycle - Math.PI/2) * 15 * s : 0;
+            // Helper to build realistic foot trajectory (ellipse-like)
+            function getFootPos(t) {
+                // Return {x, y} relative to runnerX, runnerY based on 0-1 cycle
+                // t=0 is planting foot forward, t=0.5 is sweeping back, t=1 is snapping forward again
+                let stride = isMoving ? 45 * s * (0.5 + sprintSpeed * 0.5) : 10 * s;
+                let lift = isMoving ? 30 * s * (0.3 + sprintSpeed * 0.7) : 0;
 
-            // Back leg
-            ctx.strokeStyle = darkenColor(riderColor, 40);
-            ctx.lineWidth = legWidth * s;
-            ctx.beginPath(); ctx.moveTo(runnerX, hipY); ctx.lineTo(runnerX - swing, hipY + (20*s)); ctx.lineTo(runnerX - swing - swingKnee1, hipY + (45*s)); ctx.stroke();
+                let fx, fy;
+                if (t < 0.5) {
+                    // Foot sweeping back on ground
+                    let sweepT = t / 0.5; // 0 to 1
+                    fx = Math.cos(sweepT * Math.PI) * stride; // stride to -stride
+                    fy = 0;
+                } else {
+                    // Foot recovering in air
+                    let airT = (t - 0.5) / 0.5; // 0 to 1
+                    fx = Math.cos(Math.PI + airT * Math.PI) * stride; // -stride to stride
+                    fy = -Math.sin(airT * Math.PI) * lift; // Up and down
+                }
+                return { x: runnerX + fx, y: runnerY + fy };
+            }
+
+            let foot1 = getFootPos(p1);
+            let foot2 = getFootPos(p2);
+
+            // Calculate Hip Bounce (hips drop when feet are spread, rise when legs cross)
+            let bounceScale = isMoving ? 8 * s * (0.5 + sprintSpeed * 0.5) : 0;
+            // The lowest point is t=0.25 and 0.75, highest is t=0 and 0.5
+            let bounce1 = Math.sin(p1 * Math.PI * 2);
+            let runnerBounce = isMoving ? Math.abs(bounce1) * bounceScale : 0;
+
+            // The leg lengths
+            let thighLen = 22 * s * heightMult;
+            let calfLen = 22 * s * heightMult;
+
+            // Base hip height slightly below full leg extension
+            let hipY = runnerY - (thighLen + calfLen) * 0.9 + runnerBounce;
+            let hipX = runnerX;
+
+            let lean = isMoving ? 0.3 + sprintSpeed * 0.5 : 0.05;
+            let torsoLen = 30 * s * heightMult;
+            let shoulderX = hipX + Math.sin(lean) * torsoLen;
+            let shoulderY = hipY - Math.cos(lean) * torsoLen;
+
+            let armLen1 = 15 * s * heightMult;
+            let armLen2 = 15 * s * heightMult;
+
+            // Arm swinging (opposite to legs)
+            // If foot1 is forward (p1 near 0 or 1), hand1 is backward
+            function getHandPos(t) {
+                let swing = isMoving ? 35 * s * (0.4 + sprintSpeed * 0.6) : 5 * s;
+                let armAng = Math.cos(t * Math.PI * 2) * Math.PI * 0.6; // Angle relative to torso
+
+                // Pure sine swing is too rigid, adding an offset to bend elbow
+                let hx = shoulderX - Math.cos(armAng) * swing;
+                // Hands should come up towards chest when forward, drop down when back
+                let hy = shoulderY + 15 * s + Math.sin(armAng) * swing * 0.5;
+
+                return { x: hx, y: hy };
+            }
+
+            let hand1 = getHandPos(p1);
+            let hand2 = getHandPos(p2);
+
+            // DRAWING BACK LAYER
+            // Back Arm (hand2 pairs with foot2, opposite of foot1)
+            drawIKLimb(shoulderX, shoulderY, hand2.x, hand2.y, armLen1, armLen2, armWidth * s, darkenColor(riderSkin, 20), false);
+
+            // Back Leg (foot2)
+            drawIKLimb(hipX, hipY, foot2.x, foot2.y, thighLen, calfLen, legWidth * s, darkenColor(riderColor, 40), true);
 
             // Body
             ctx.strokeStyle = riderColor;
             ctx.lineWidth = bodyWidth * s;
-            ctx.beginPath(); ctx.moveTo(runnerX, hipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(hipX, hipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
 
             // Head
-            let headCenterX = shoulderX + (5*s);
-            let headCenterY = shoulderY - (10*s);
+            let headCenterX = shoulderX + Math.sin(lean) * (8*s);
+            let headCenterY = shoulderY - Math.cos(lean) * (8*s);
             let headSize = rShape === 'large' ? 8 : (rShape === 'small' ? 5 : 6);
             ctx.fillStyle = riderSkin;
             ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill();
@@ -1210,32 +1316,19 @@
             ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), headSize*2.3*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), headSize*1.2*s, Math.PI, 0); ctx.fill();
 
-            // Arms
-            let armSwing = isMoving ? Math.cos(runnerCycle) * 25 * s : 0;
-            let elbowSwing1 = isMoving ? Math.cos(runnerCycle - Math.PI/2) * 15 * s : 0;
-            let elbowSwing2 = isMoving ? Math.cos(runnerCycle + Math.PI/2) * 15 * s : 0;
+            // DRAWING FRONT LAYER
+            // Front Leg (foot1)
+            drawIKLimb(hipX, hipY, foot1.x, foot1.y, thighLen, calfLen, legWidth * s, riderColor, true);
 
-            // Back arm
-            ctx.strokeStyle = darkenColor(riderSkin, 20);
-            ctx.lineWidth = armWidth * s;
-            ctx.beginPath(); ctx.moveTo(shoulderX, shoulderY); ctx.lineTo(shoulderX + armSwing, shoulderY + (15*s)); ctx.lineTo(shoulderX + armSwing + elbowSwing1, shoulderY + (25*s)); ctx.stroke();
-
-            // Front leg
-            ctx.strokeStyle = riderColor;
-            ctx.lineWidth = legWidth * s;
-            ctx.beginPath(); ctx.moveTo(runnerX, hipY); ctx.lineTo(runnerX + swing, hipY + (20*s)); ctx.lineTo(runnerX + swing - swingKnee2, hipY + (45*s)); ctx.stroke();
-
-            // Front arm
-            ctx.strokeStyle = riderSkin;
-            ctx.lineWidth = armWidth * s;
-            ctx.beginPath(); ctx.moveTo(shoulderX, shoulderY); ctx.lineTo(shoulderX - armSwing, shoulderY + (15*s)); ctx.lineTo(shoulderX - armSwing + elbowSwing2, shoulderY + (25*s)); ctx.stroke();
+            // Front Arm (hand1)
+            drawIKLimb(shoulderX, shoulderY, hand1.x, hand1.y, armLen1, armLen2, armWidth * s, riderSkin, false);
 
             // Name Tag
             ctx.fillStyle = 'white';
             ctx.font = `bold ${14*s}px Georgia`;
             ctx.textAlign = 'center';
             ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
-            ctx.fillText(racer.name, runnerX, hipY - (45*s));
+            ctx.fillText(racer.name, runnerX, hipY - (45*s) - runnerBounce);
             ctx.shadowBlur = 0;
             ctx.textAlign = 'left';
 
@@ -1320,8 +1413,11 @@
         ctx.fillText(`SPEED: ${Math.round(p.speed / 100)} km/h`, 20, 65);
 
         let flash = p.flashTimer > 0 && Math.floor(p.flashTimer / 3) % 2 === 0;
+        let isSmallScreen = width < 500;
+        let stamX = isSmallScreen ? width - 150 : width - 250;
+
         ctx.fillStyle = flash ? '#ff3300' : '#ffcc80';
-        ctx.fillText(`STAMINA`, width - 250, 35);
+        if (!isSmallScreen) ctx.fillText(`STAMINA`, stamX, 35);
         
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#3e2723';
@@ -1345,7 +1441,7 @@
         ctx.fillText(`TRACK`, 20, height - 20);
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'rgba(30, 20, 15, 0.8)';
-        let barW = width - 120;
+        let barW = width - 140;
         ctx.fillRect(100, height - 35, barW, 20);
         
         ctx.strokeStyle = '#5d4037';

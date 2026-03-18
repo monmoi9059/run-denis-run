@@ -18,26 +18,40 @@
             overflow: hidden;
         }
         #game-container {
-            position: relative;
-            margin-top: 20px;
-            box-shadow: 0 0 50px rgba(255, 100, 50, 0.2), 0 0 20px rgba(0,0,0,1);
-            border: 4px solid #2a1f1a;
-            border-radius: 8px;
-            width: 800px;
-            height: 400px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
+            background-color: #2b0f4c;
         }
         canvas {
             display: block;
-            background-color: #2b0f4c; 
+            width: 100%;
+            height: 100%;
         }
         #instructions {
-            margin-top: 15px;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             text-align: center;
-            max-width: 800px;
-            font-size: 15px;
+            max-width: 90vw;
+            font-size: 14px;
             font-family: 'Courier New', Courier, monospace;
             color: #aaa;
+            z-index: 20;
+            pointer-events: none;
+            background: rgba(15, 12, 27, 0.8);
+            padding: 5px 10px;
+            border-radius: 8px;
+            display: none;
+        }
+        @media (min-width: 768px) {
+            #instructions {
+                display: block;
+            }
         }
         .key {
             background: #f4e8d1;
@@ -83,12 +97,51 @@
             max-width: 700px;
         }
         .mount-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
             margin-bottom: 15px;
             width: 100%;
             max-width: 700px;
+        }
+        .selector-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(145deg, #3e2723, #211512);
+            border: 2px solid #5d4037;
+            padding: 10px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 250px;
+        }
+        .selector-container label {
+            color: #ffcc80;
+            margin-bottom: 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .selector-container select {
+            width: 100%;
+            padding: 8px;
+            background: #211512;
+            color: #f4e8d1;
+            border: 1px solid #795548;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 16px;
+        }
+        .selector-desc {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #bcaaa4;
+            text-align: center;
+            min-height: 40px;
+        }
+        .selector-action {
+            margin-top: 5px;
         }
         .shop-item {
             background: linear-gradient(145deg, #3e2723, #211512);
@@ -161,12 +214,47 @@
                 </div>
             </div>
 
-            <div class="menu-title" style="font-size: 22px; margin-top: 5px; color: #aed581; text-shadow: 1px 1px 0px #000;">Select Mount</div>
+            <div class="menu-title" style="font-size: 22px; margin-top: 5px; color: #aed581; text-shadow: 1px 1px 0px #000;">Select Racer</div>
             <div id="mount-grid" class="mount-grid">
-                <!-- Filled via JS -->
+                <!-- Selectors Filled via JS -->
+                <div class="selector-container" id="rider-selector-container">
+                    <label for="rider-select">Rider</label>
+                    <select id="rider-select" onchange="handleRiderSelectChange()"></select>
+                    <div id="rider-desc" class="selector-desc"></div>
+                    <div id="rider-action" class="selector-action"></div>
+                </div>
+
+                <div class="selector-container" id="mount-selector-container">
+                    <label for="mount-select">Mount</label>
+                    <select id="mount-select" onchange="handleMountSelectChange()"></select>
+                    <div id="mount-desc" class="selector-desc"></div>
+                    <div id="mount-action" class="selector-action"></div>
+                </div>
             </div>
             
             <button class="action-btn" onclick="startRace()">Enter Next Race</button>
+            <button class="action-btn" style="background: #4fc3f7; color: #01579b; border-bottom-color: #0277bd; margin-top: 10px;" onclick="openCustomRaceMenu()">Custom Race</button>
+        </div>
+
+        <!-- CUSTOM RACE OVERLAY -->
+        <div id="custom-race-ui" class="overlay hidden">
+            <div class="menu-title">Custom Race</div>
+
+            <div class="selector-container" style="max-width: 400px; margin-bottom: 20px;">
+                <label for="custom-length">Track Length</label>
+                <select id="custom-length">
+                    <option value="50000">Sprint (50k)</option>
+                    <option value="150000" selected>Standard (150k)</option>
+                    <option value="300000">Marathon (300k)</option>
+                </select>
+
+                <label for="custom-difficulty" style="margin-top: 15px;">Difficulty (AI Boost & Prize)</label>
+                <input type="range" id="custom-difficulty" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('diff-val').innerText = this.value + 'x';">
+                <span id="diff-val" style="color:#ffcc80; margin-bottom: 10px;">1.0x</span>
+            </div>
+
+            <button class="action-btn" onclick="startCustomRace()">Start Custom Race</button>
+            <button class="action-btn" style="background: #e57373; margin-top: 10px;" onclick="openShop()">Back</button>
         </div>
         
         <!-- RESULTS OVERLAY -->
@@ -189,8 +277,17 @@
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    window.addEventListener('resize', () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    });
 
     // --- META GAME STATE ---
     let gameState = 'SHOP'; 
@@ -200,9 +297,21 @@
     let upgrades = { speed: 1, accel: 1, stamina: 1, assist: 1 };
     function getUpgradeCost(type) { return upgrades[type] * 50; }
 
+    // --- RIDER TYPES ---
+    const RIDER_TYPES = {
+        default: { name: "Local Hand", cost: 0, spdBonus: 0, accBonus: 0, drainBonus: 0, regBonus: 0, color: '#006064', desc: "Standard issue cowpoke. No stat bonuses.", shape: "normal" },
+        jockey: { name: "Pro Jockey", cost: 200, spdBonus: 500, accBonus: 200, drainBonus: 0, regBonus: 0, color: '#b71c1c', desc: "+Speed, +Acceleration. A true racer.", shape: "small" },
+        bruiser: { name: "Heavy Bruiser", cost: 350, spdBonus: -500, accBonus: -300, drainBonus: -1.0, regBonus: 0.5, color: '#212121', desc: "Very heavy. Slows mount but saves stamina.", shape: "large" },
+        sprinter: { name: "Track Star", cost: 500, spdBonus: 800, accBonus: 500, drainBonus: 0.5, regBonus: -0.2, color: '#ffb300', desc: "Massive speed boost, but burns stamina faster.", shape: "tall" }
+    };
+    let unlockedRiders = ['default'];
+    let selectedRider = 'default';
+
     // --- ANIMAL TYPES ---
     const ANIMAL_TYPES = {
-        horse: { name: "Quarter Horse", runStyle: 'gallop', cost: 0, spd: 8800, acc: 1500, drain: 2.5, reg: 1.0, color: '#8d6e63', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Balanced realistic speed (~88 km/h)." },
+
+        human: { name: "Sprint on Foot", runStyle: 'gallop', cost: 0, spd: 1800, acc: 600, drain: 1.5, reg: 1.5, color: '#ffffff', scale: 1.0, isHuman: true, desc: "Just you, running. No mount." },
+        horse: { name: "Quarter Horse", runStyle: 'gallop', cost: 20, spd: 8800, acc: 1500, drain: 2.5, reg: 1.0, color: '#8d6e63', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Balanced realistic speed (~88 km/h)." },
         donkey: { name: "Stubborn Donkey", runStyle: 'gallop', cost: 50, spd: 5500, acc: 1000, drain: 1.5, reg: 1.5, color: '#9e9e9e', scale: 0.8, horns: false, antlers: false, tail: 'thin', desc: "Slower but highly resilient (~55 km/h)." },
         zebra: { name: "Savannah Zebra", runStyle: 'gallop', cost: 150, spd: 6500, acc: 1800, drain: 2.8, reg: 0.9, color: '#e0e0e0', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Wild and swift (~65 km/h)." },
         pig: { name: "Giant Farm Pig", runStyle: 'waddle', cost: 300, spd: 1800, acc: 800, drain: 3.5, reg: 1.0, color: '#f8bbd0', scale: 0.7, horns: false, antlers: false, tail: 'thin', desc: "Realistic pig speeds (~18 km/h). Slow." },
@@ -221,8 +330,8 @@
         triceratops: { name: "Triceratops", runStyle: 'lumber', cost: 12000, spd: 3000, acc: 1200, drain: 2.5, reg: 0.8, color: '#81c784', scale: 1.4, horns: true, antlers: false, tail: 'long', desc: "Extinct, huge, logically quite slow." },
         unicorn: { name: "Mystic Unicorn", runStyle: 'gallop', cost: 20000, spd: 9500, acc: 4000, drain: 1.5, reg: 2.0, color: '#f8bbd0', scale: 1.0, horns: true, antlers: false, tail: 'long', desc: "The ultimate magical mount." }
     };
-    let unlockedAnimals = ['horse'];
-    let selectedAnimal = 'horse';
+    let unlockedAnimals = ['human'];
+    let selectedAnimal = 'human';
     
     // Opponents / Tournaments
     const tournaments = [
@@ -248,6 +357,9 @@
     let postRaceTimer = 0;
     let racers = []; 
     let dustParticles = [];
+    let isCustomRace = false;
+    let customTrackLength = 150000;
+    let customDifficulty = 1.0;
     let speedLines = [];
     let floatingTexts = [];
     let leaderboardResults = [];
@@ -279,47 +391,143 @@
             if (upgrades[type] >= 10) btn.innerText = "MAX";
         });
 
-        renderMountShop();
+        renderMountSelector();
+        renderRiderSelector();
     }
 
-    function renderMountShop() {
-        const grid = document.getElementById('mount-grid');
-        grid.innerHTML = '';
+    function renderMountSelector() {
+        const select = document.getElementById('mount-select');
+        let currentVal = select.value;
+        select.innerHTML = '';
+
         for (let key in ANIMAL_TYPES) {
             let anim = ANIMAL_TYPES[key];
             let isUnlocked = unlockedAnimals.includes(key);
-            let isSelected = selectedAnimal === key;
+            let nameDisplay = isUnlocked ? anim.name : `${anim.name} ($${anim.cost})`;
             
-            let btnText = isSelected ? "SELECTED" : (isUnlocked ? "SELECT" : `BUY: $${anim.cost}`);
-            let btnDisabled = isSelected || (!isUnlocked && money < anim.cost);
-            let borderStyle = isSelected ? "border-color: #aed581;" : "";
-            let btnStyle = isSelected ? "background: #aed581; color: #1a1a1a; border-color: #8bc34a;" : "";
-            
-            grid.innerHTML += `
-                <div class="shop-item" style="${borderStyle}">
-                    <div>
-                        <h4>${anim.name}</h4>
-                        <p>${anim.desc}</p>
-                        <div style="font-size: 10px; color: #9e9e9e; margin-bottom: 5px; text-align: left;">
-                            SPD: ${anim.spd} | ACC: ${anim.acc}<br>
-                            STM Drain: ${anim.drain} | Regen: ${anim.reg}
-                        </div>
-                    </div>
-                    <button onclick="handleMountClick('${key}')" ${btnDisabled ? 'disabled' : ''} style="${btnStyle}">${btnText}</button>
-                </div>
-            `;
+            let option = document.createElement('option');
+            option.value = key;
+            option.innerText = nameDisplay;
+            select.appendChild(option);
         }
+
+        // Restore selection or default to active
+        if (currentVal && ANIMAL_TYPES[currentVal]) {
+            select.value = currentVal;
+        } else {
+            select.value = selectedAnimal;
+        }
+
+        updateMountDetails();
+    }
+
+    function renderRiderSelector() {
+        const select = document.getElementById('rider-select');
+        let currentVal = select.value;
+        select.innerHTML = '';
+
+        for (let key in RIDER_TYPES) {
+            let rider = RIDER_TYPES[key];
+            let isUnlocked = unlockedRiders.includes(key);
+            let nameDisplay = isUnlocked ? rider.name : `${rider.name} ($${rider.cost})`;
+            
+            let option = document.createElement('option');
+            option.value = key;
+            option.innerText = nameDisplay;
+            select.appendChild(option);
+        }
+
+        if (currentVal && RIDER_TYPES[currentVal]) {
+            select.value = currentVal;
+        } else {
+            select.value = selectedRider;
+        }
+
+        updateRiderDetails();
+    }
+
+    function updateRiderDetails() {
+        let key = document.getElementById('rider-select').value;
+        let rider = RIDER_TYPES[key];
+        let descDiv = document.getElementById('rider-desc');
+        let actionDiv = document.getElementById('rider-action');
+
+        descDiv.innerHTML = `${rider.desc}<br>SPD: ${rider.spdBonus>0?'+':''}${rider.spdBonus} | ACC: ${rider.accBonus>0?'+':''}${rider.accBonus}<br>Drain: ${rider.drainBonus>0?'+':''}${rider.drainBonus} | Regen: ${rider.regBonus>0?'+':''}${rider.regBonus}`;
+
+        let isUnlocked = unlockedRiders.includes(key);
+        let isSelected = selectedRider === key;
+
+        if (isSelected) {
+            actionDiv.innerHTML = `<button class="shop-item button" style="background:#aed581; color:#1a1a1a; padding:5px; border-radius:4px; border:none; font-weight:bold; width:100%;">SELECTED</button>`;
+        } else if (isUnlocked) {
+            actionDiv.innerHTML = `<button onclick="handleRiderClick('${key}')" style="background:#ffb74d; color:#3e2723; padding:5px; border-radius:4px; border:none; font-weight:bold; cursor:pointer; width:100%;">SELECT</button>`;
+        } else {
+            let canAfford = money >= rider.cost;
+            let bg = canAfford ? '#ff7043' : '#3e2723';
+            let cursor = canAfford ? 'pointer' : 'not-allowed';
+            let color = canAfford ? '#fff' : '#795548';
+            actionDiv.innerHTML = `<button onclick="handleRiderClick('${key}')" ${canAfford ? '' : 'disabled'} style="background:${bg}; color:${color}; padding:5px; border-radius:4px; border:none; font-weight:bold; cursor:${cursor}; width:100%;">BUY ($${rider.cost})</button>`;
+        }
+    }
+
+    function handleRiderSelectChange() {
+        updateRiderDetails();
+    }
+
+    function handleRiderClick(key) {
+        let rider = RIDER_TYPES[key];
+        if (unlockedRiders.includes(key)) {
+            selectedRider = key;
+            document.getElementById('rider-select').value = key;
+            updateShopUI();
+        } else if (money >= rider.cost) {
+            money -= rider.cost;
+            unlockedRiders.push(key);
+            selectedRider = key;
+            document.getElementById('rider-select').value = key;
+            updateShopUI();
+        }
+    }
+
+    function updateMountDetails() {
+        let key = document.getElementById('mount-select').value;
+        let anim = ANIMAL_TYPES[key];
+        let descDiv = document.getElementById('mount-desc');
+        let actionDiv = document.getElementById('mount-action');
+
+        descDiv.innerHTML = `${anim.desc}<br>SPD: ${anim.spd} | ACC: ${anim.acc}<br>Drain: ${anim.drain} | Regen: ${anim.reg}`;
+
+        let isUnlocked = unlockedAnimals.includes(key);
+        let isSelected = selectedAnimal === key;
+
+        if (isSelected) {
+            actionDiv.innerHTML = `<button class="shop-item button" style="background:#aed581; color:#1a1a1a; padding:5px; border-radius:4px; border:none; font-weight:bold; width:100%;">SELECTED</button>`;
+        } else if (isUnlocked) {
+            actionDiv.innerHTML = `<button onclick="handleMountClick('${key}')" style="background:#ffb74d; color:#3e2723; padding:5px; border-radius:4px; border:none; font-weight:bold; cursor:pointer; width:100%;">SELECT</button>`;
+        } else {
+            let canAfford = money >= anim.cost;
+            let bg = canAfford ? '#ff7043' : '#3e2723';
+            let cursor = canAfford ? 'pointer' : 'not-allowed';
+            let color = canAfford ? '#fff' : '#795548';
+            actionDiv.innerHTML = `<button onclick="handleMountClick('${key}')" ${canAfford ? '' : 'disabled'} style="background:${bg}; color:${color}; padding:5px; border-radius:4px; border:none; font-weight:bold; cursor:${cursor}; width:100%;">BUY ($${anim.cost})</button>`;
+        }
+    }
+
+    function handleMountSelectChange() {
+        updateMountDetails();
     }
 
     function handleMountClick(key) {
         let anim = ANIMAL_TYPES[key];
         if (unlockedAnimals.includes(key)) {
             selectedAnimal = key;
+            document.getElementById('mount-select').value = key;
             updateShopUI();
         } else if (money >= anim.cost) {
             money -= anim.cost;
             unlockedAnimals.push(key);
             selectedAnimal = key;
+            document.getElementById('mount-select').value = key;
             updateShopUI();
         }
     }
@@ -337,16 +545,55 @@
         gameState = 'SHOP';
         document.getElementById('shop-ui').classList.remove('hidden');
         document.getElementById('results-ui').classList.add('hidden');
+        document.getElementById('custom-race-ui').classList.add('hidden');
         updateShopUI();
     }
 
-    function startRace() {
+    function openCustomRaceMenu() {
         document.getElementById('shop-ui').classList.add('hidden');
+        document.getElementById('custom-race-ui').classList.remove('hidden');
+    }
+
+    function startCustomRace() {
+        isCustomRace = true;
+        customTrackLength = parseInt(document.getElementById('custom-length').value);
+        customDifficulty = parseFloat(document.getElementById('custom-difficulty').value);
+        document.getElementById('custom-race-ui').classList.add('hidden');
+
+        setupRace(true);
+    }
+
+    function startRace() {
+        isCustomRace = false;
+        document.getElementById('shop-ui').classList.add('hidden');
+        
+        setupRace(false);
+    }
+
+    function setupRace(isCustom) {
         gameState = 'RACE';
         
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let tourney = tournaments[tIndex];
-        
+        let tourney;
+        if (isCustom) {
+            let names = ["Speedy Pete", "Fast John", "Wild Bill", "Coyote", "Dusty", "Bullet"];
+            let name1 = names[Math.floor(Math.random() * names.length)];
+            let name2 = names[Math.floor(Math.random() * names.length)];
+            let animKeys = Object.keys(ANIMAL_TYPES);
+            let anim1 = animKeys[Math.floor(Math.random() * animKeys.length)];
+            let anim2 = animKeys[Math.floor(Math.random() * animKeys.length)];
+
+            tourney = {
+                name: "Custom Race", length: customTrackLength,
+                ai: [
+                    { name: name1, anim: anim1, color: '#9e9e9e', riderColor: '#4e342e', baseSpeed: 9000 * customDifficulty, perfChance: 0.3 * customDifficulty },
+                    { name: name2, anim: anim2, color: '#f8bbd0', riderColor: '#3e2723', baseSpeed: 8000 * customDifficulty, perfChance: 0.2 * customDifficulty }
+                ]
+            };
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            tourney = tournaments[tIndex];
+        }
+
         raceTimer = 0;
         postRaceTimer = 0;
         dustParticles = [];
@@ -366,15 +613,53 @@
             });
         }
         
-        // Combine Base Mount Stats + Upgrades
+        // Combine Base Mount Stats + Upgrades + Rider Stats
         let anim = ANIMAL_TYPES[selectedAnimal];
-        let playerMaxSpeed = anim.spd + (upgrades.speed * 800);
-        let playerAccel = anim.acc + (upgrades.accel * 250);
+        let riderInfo = RIDER_TYPES[selectedRider];
+        let playerMaxSpeed = anim.spd + (upgrades.speed * 800) + riderInfo.spdBonus;
+        let playerAccel = anim.acc + (upgrades.accel * 250) + riderInfo.accBonus;
         let playerAssist = 1.0 + (upgrades.assist * 0.15); 
-        let pStamDrain = Math.max(0.5, anim.drain - (upgrades.stamina * 0.2));
-        let pStamRegen = anim.reg + (upgrades.stamina * 0.1); 
+        let pStamDrain = Math.max(0.5, anim.drain - (upgrades.stamina * 0.2) + riderInfo.drainBonus);
+        let pStamRegen = anim.reg + (upgrades.stamina * 0.1) + riderInfo.regBonus;
+
+        // Match opponent mounts to the player's current mount in tournaments
+        // If it's a Custom Race, we keep the random anim types generated earlier.
+        let ai1AnimType = isCustom ? tourney.ai[0].anim : selectedAnimal;
+        let ai2AnimType = isCustom ? tourney.ai[1].anim : selectedAnimal;
+
+        // Scale opponents dynamically to the player's total top speed.
+        // For custom races, base it on difficulty.
+        // For tournaments, base it on the tournament tier (currentTourney) so early ones are easy.
+        let tIndex = Math.min(currentTourney, tournaments.length - 1);
+        let tMultiplier1 = isCustom ? (0.95 + (0.10 * customDifficulty)) : (0.75 + (0.05 * tIndex));
+        let tMultiplier2 = isCustom ? (0.85 + (0.10 * customDifficulty)) : (0.70 + (0.05 * tIndex));
+
+        let ai1BaseSpeed = playerMaxSpeed * tMultiplier1;
+        let ai2BaseSpeed = playerMaxSpeed * tMultiplier2;
+
+        // Add a slight variance based on AI's anim spd so they aren't identical
+        ai1BaseSpeed += (ANIMAL_TYPES[ai1AnimType].spd * 0.1);
+        ai2BaseSpeed += (ANIMAL_TYPES[ai2AnimType].spd * 0.1);
+
+        // Adjust perfChance (timing ability) based on early tournament progression so they miss often early on
+        let ai1PerfChance = isCustom ? tourney.ai[0].perfChance : Math.min(0.9, 0.2 + (tIndex * 0.2));
+        let ai2PerfChance = isCustom ? tourney.ai[1].perfChance : Math.min(0.85, 0.15 + (tIndex * 0.2));
 
         racers = [
+
+            { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: ai1AnimType, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor, riderShape: 'normal',
+              y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, maxSpeed: ai1BaseSpeed,
+              phase: Math.random(), stamina: 100, perfChance: ai1PerfChance, finished: false, finishTime: 0 },
+
+            { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
+              y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, maxSpeed: playerMaxSpeed,
+              accel: playerAccel, assist: playerAssist, stamDrain: pStamDrain, stamRegen: pStamRegen,
+              phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
+
+            { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: ai2AnimType, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor, riderShape: 'normal',
+              y: height - 60, scale: ANIMAL_TYPES[ai2AnimType].scale * 1.3, dist: 0, speed: 0, maxSpeed: ai2BaseSpeed,
+              phase: Math.random(), stamina: 100, perfChance: ai2PerfChance, finished: false, finishTime: 0 }
+
             { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: tourney.ai[0].anim, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor,
               y: height - 140, scale: ANIMAL_TYPES[tourney.ai[0].anim].scale * 0.75, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: tourney.ai[0].baseSpeed,
               phase: Math.random(), stamina: 100, perfChance: tourney.ai[0].perfChance, finished: false, finishTime: 0 },
@@ -387,6 +672,7 @@
             { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: tourney.ai[1].anim, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor,
               y: height - 60, scale: ANIMAL_TYPES[tourney.ai[1].anim].scale * 1.3, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: tourney.ai[1].baseSpeed,
               phase: Math.random(), stamina: 100, perfChance: tourney.ai[1].perfChance, finished: false, finishTime: 0 }
+
         ];
     }
 
@@ -440,12 +726,18 @@
         
         let allFinished = true;
         let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = tournaments[tIndex].length;
+        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
         
         let playerRacer = racers.find(r => r.isPlayer);
         let anyMoving = false;
 
+        // Dynamic y positioning for responsive resizing
+        let spacing = 40;
+        let baseY = height - 100;
+        let yOffsets = { 'ai1': baseY - spacing, 'player': baseY, 'ai2': baseY + spacing };
+
         racers.forEach(r => {
+            r.y = yOffsets[r.id];
             if (!r.finished) {
                 allFinished = false;
                 
@@ -592,16 +884,23 @@
         });
         document.getElementById('leaderboard').innerHTML = listHtml;
         
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
         let prize = 0;
-        if (playerPos === 1) prize = tournaments[tIndex].prize;
-        else if (playerPos === 2) prize = Math.floor(tournaments[tIndex].prize * 0.3);
-        else prize = Math.floor(tournaments[tIndex].prize * 0.1); 
+        if (isCustomRace) {
+            let basePrize = customTrackLength === 50000 ? 50 : (customTrackLength === 150000 ? 150 : 300);
+            if (playerPos === 1) prize = Math.floor(basePrize * customDifficulty * 2);
+            else if (playerPos === 2) prize = Math.floor(basePrize * customDifficulty * 0.5);
+            else prize = Math.floor(basePrize * customDifficulty * 0.2);
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            if (playerPos === 1) prize = tournaments[tIndex].prize;
+            else if (playerPos === 2) prize = Math.floor(tournaments[tIndex].prize * 0.3);
+            else prize = Math.floor(tournaments[tIndex].prize * 0.1);
+
+            if (playerPos === 1 && currentTourney < tournaments.length - 1) currentTourney++;
+        }
         
         document.getElementById('prize-display').innerText = prize;
         money += prize;
-        
-        if (playerPos === 1 && currentTourney < tournaments.length - 1) currentTourney++; 
     }
 
     // --- RENDERING ---
@@ -614,7 +913,8 @@
         ctx.clearRect(0, 0, width, height);
         
         let playerDist = racers.find(r => r.isPlayer)?.dist || 0;
-        let trackLength = tournaments[Math.min(currentTourney, tournaments.length - 1)].length;
+        let tIndex = Math.min(currentTourney, tournaments.length - 1);
+        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
 
         drawEnvironment(playerDist);
         drawFinishLine(playerDist, trackLength);
@@ -659,10 +959,12 @@
         ctx.fill();
         ctx.shadowBlur = 0;
 
+
         // Distant Mountains
+        let numDistMtns = Math.ceil(width / 300) + 2;
         let distMtnOffset = (playerDist * 0.015) % 800;
         ctx.fillStyle = '#2a1a2e';
-        for(let i = 0; i < 4; i++) {
+        for(let i = -1; i < numDistMtns; i++) {
             let x = (i * 300) - distMtnOffset;
             ctx.beginPath();
             ctx.moveTo(x - 100, height - 100);
@@ -673,9 +975,10 @@
         }
 
         // Mid Mountains
+        let numMtns = Math.ceil(width / 400) + 2;
         let mtnOffset = (playerDist * 0.04) % 800;
         ctx.fillStyle = '#1e0f1e';
-        for(let i = 0; i < 3; i++) {
+        for(let i = -1; i < numMtns; i++) {
             let x = (i * 400) - mtnOffset;
             ctx.beginPath();
             ctx.moveTo(x - 50, height - 100);
@@ -686,9 +989,10 @@
         }
 
         // Trees
+        let numTrees = Math.ceil(width / 200) + 2;
         let treeOffset = (playerDist * 0.15) % 400;
         ctx.fillStyle = '#100510';
-        for(let i = 0; i < 5; i++) {
+        for(let i = -1; i < numTrees; i++) {
             let x = (i * 200) - treeOffset;
             ctx.beginPath();
             ctx.moveTo(x + 20, height - 100);
@@ -707,6 +1011,13 @@
         ctx.fillStyle = groundGrad; 
         ctx.fillRect(0, height - 150, width, 150);
 
+
+        let numGround = Math.ceil(width / 150) + 2;
+        let groundOffset = (playerDist * 0.8) % 150;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        for(let i = -1; i < numGround; i++) {
+            ctx.fillRect((i * 150) - groundOffset, height - 150, 40, 150);
+
         // Ground Details (grass/dirt lines)
         let groundOffset = (playerDist * 0.8) % 200;
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
@@ -718,13 +1029,15 @@
             ctx.lineTo(gx + 100, height - 130);
             ctx.lineTo(gx + 150, height - 150);
             ctx.fill();
+
         }
     }
 
     function drawForegroundParallax(playerDist) {
+        let numFg = Math.ceil(width / 400) + 2;
         let fgOffset = (playerDist * 2.5) % 400;
         ctx.fillStyle = '#0a0505'; 
-        for(let i = 0; i < 4; i++) {
+        for(let i = -1; i < numFg; i++) {
             let x = (i * 400) - fgOffset;
             ctx.fillRect(x, height - 80, 20, 80);
             ctx.fillRect(x - 400, height - 60, 420, 10);
@@ -875,179 +1188,354 @@
             ctx.beginPath(); ctx.arc(hoofX, hoofY, width * 0.6, 0, Math.PI * 2); ctx.fill();
         }
 
+
+        function drawIKLimb(startX, startY, endX, endY, len1, len2, width, color, invertKnee = false) {
+            let dx = endX - startX;
+            let dy = endY - startY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Prevent impossible stretch
+            if (dist > len1 + len2) {
+                let ratio = (len1 + len2) / dist;
+                endX = startX + dx * ratio;
+                endY = startY + dy * ratio;
+                dist = len1 + len2;
+            }
+
+            // Law of Cosines
+            let a = len1;
+            let b = len2;
+            let c = dist;
+
+            // Angle of the line connecting start to end
+            let baseAngle = Math.atan2(dy, dx);
+
+            // Angle between base line and first limb segment
+            let acosVal = (a * a + c * c - b * b) / (2 * a * c);
+            acosVal = Math.max(-1, Math.min(1, acosVal)); // clamp
+            let innerAngle = Math.acos(acosVal);
+
+            let jointAngle = invertKnee ? baseAngle - innerAngle : baseAngle + innerAngle;
+
+            let jointX = startX + Math.cos(jointAngle) * a;
+            let jointY = startY + Math.sin(jointAngle) * a;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(jointX, jointY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
+        let fb = {u: Math.sin(cycle + Math.PI)*0.6 - 0.2, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*1.2 : 0};
+        let nb = {u: Math.sin(cycle + Math.PI + 0.5)*0.6 - 0.2, l: Math.sin(cycle + Math.PI + 0.5)>0 ? Math.sin(cycle + Math.PI + 0.5)*1.2 : 0};
+        let ff = {u: Math.sin(cycle)*0.7 + 0.1, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*1.6 : Math.sin(cycle)*0.2};
+        let nf = {u: Math.sin(cycle + 0.5)*0.7 + 0.1, l: Math.sin(cycle + 0.5)>0 ? -Math.sin(cycle + 0.5)*1.6 : Math.sin(cycle + 0.5)*0.2};
+
+        // Shadow
+
         // Shadow based on body bounce
         let shadowW = Math.max(20*s, (45 * s) - (bounce * 1.5));
+
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.beginPath(); ctx.ellipse(pX, pY, shadowW, 8 * s, 0, 0, Math.PI*2); ctx.fill();
 
-        // Far Legs
-        drawLimb(rumpX, rumpY + (5*s), fb.u, fb.l, 18*s, 22*s, 9*s, colorDark); 
-        drawLimb(chestX, chestY + (5*s), ff.u, ff.l, 18*s, 22*s, 8*s, colorDark);
+        let headX = 0, headY = 0;
 
-        // Tail Based on Type
-        ctx.strokeStyle = colorDark;
-        ctx.fillStyle = colorDark;
-        if (animTypeInfo.tail === 'long') {
-            let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
-            let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
-            ctx.lineWidth = 6 * s;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
-            ctx.quadraticCurveTo(rumpX - (30*s) - tailStretch, rumpY - (5*s) + tailWhip, rumpX - (25*s) - tailStretch, rumpY + (20*s));
-            ctx.stroke();
-        } else if (animTypeInfo.tail === 'thin') {
-            let tailWhip = isMoving ? Math.sin(cycle * 3) * 15 * s : 0;
-            ctx.lineWidth = 3 * s;
-            ctx.beginPath();
-            ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
-            ctx.lineTo(rumpX - (25*s) + tailWhip, rumpY + (15*s));
-            ctx.stroke();
-            // Tuft
-            ctx.beginPath();
-            ctx.arc(rumpX - (25*s) + tailWhip, rumpY + (15*s), 4*s, 0, Math.PI*2);
-            ctx.fill();
-        } else if (animTypeInfo.tail === 'stub') {
-            let tailWhip = isMoving ? Math.sin(cycle * 5) * 3 * s : 0;
-            ctx.beginPath();
-            ctx.ellipse(rumpX - (16*s), rumpY - (10*s) + tailWhip, 6*s, 3*s, -Math.PI/4, 0, Math.PI*2);
-            ctx.fill();
-        }
+        if (!animTypeInfo.isHuman) {
+            // Far Legs
+            drawLimb(rumpX, rumpY + (5*s), fb.u, fb.l, 18*s, 22*s, 9*s, colorDark);
+            drawLimb(chestX, chestY + (5*s), ff.u, ff.l, 18*s, 22*s, 8*s, colorDark);
 
-        // Body Mass
-        ctx.fillStyle = colorMain;
-        ctx.beginPath();
-        ctx.moveTo(chestX, chestY - (15*s)); ctx.lineTo(rumpX, rumpY - (12*s));
-        ctx.lineTo(rumpX, rumpY + (12*s)); ctx.lineTo(chestX, chestY + (15*s)); ctx.fill();
-        ctx.beginPath(); ctx.arc(rumpX, rumpY, 16*s, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(chestX, chestY, 18*s, 0, Math.PI*2); ctx.fill();
-
-        // Neck and Head
-        let neckBaseX = chestX + (10*s);
-        let neckBaseY = chestY - (10*s);
-        let headDip = isMoving ? Math.sin(cycle) * 8 * s : 0;
-        let headX = neckBaseX + (20*s) + (Math.cos(pitch)*10*s);
-        let headY = neckBaseY - (25*s) + headDip;
-
-        ctx.strokeStyle = colorMain;
-        ctx.lineWidth = 14 * s;
-        ctx.beginPath(); ctx.moveTo(neckBaseX, neckBaseY); ctx.lineTo(headX - (5*s), headY + (5*s)); ctx.stroke();
-
-        // Mane (Flowing behind neck) if horse
-        if (animTypeInfo.tail === 'long') {
-            let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
-            let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
+            // Tail Based on Type
+            ctx.strokeStyle = colorDark;
             ctx.fillStyle = colorDark;
+            if (animTypeInfo.tail === 'long') {
+                let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
+                let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
+                ctx.lineWidth = 6 * s;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
+                ctx.quadraticCurveTo(rumpX - (30*s) - tailStretch, rumpY - (5*s) + tailWhip, rumpX - (25*s) - tailStretch, rumpY + (20*s));
+                ctx.stroke();
+            } else if (animTypeInfo.tail === 'thin') {
+                let tailWhip = isMoving ? Math.sin(cycle * 3) * 15 * s : 0;
+                ctx.lineWidth = 3 * s;
+                ctx.beginPath();
+                ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
+                ctx.lineTo(rumpX - (25*s) + tailWhip, rumpY + (15*s));
+                ctx.stroke();
+                // Tuft
+                ctx.beginPath();
+                ctx.arc(rumpX - (25*s) + tailWhip, rumpY + (15*s), 4*s, 0, Math.PI*2);
+                ctx.fill();
+            } else if (animTypeInfo.tail === 'stub') {
+                let tailWhip = isMoving ? Math.sin(cycle * 5) * 3 * s : 0;
+                ctx.beginPath();
+                ctx.ellipse(rumpX - (16*s), rumpY - (10*s) + tailWhip, 6*s, 3*s, -Math.PI/4, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Body Mass
+            ctx.fillStyle = colorMain;
             ctx.beginPath();
-            ctx.moveTo(neckBaseX - (5*s), neckBaseY - (10*s));
-            ctx.lineTo(headX - (10*s), headY - (5*s));
-            ctx.lineTo(headX - (25*s) - tailStretch*0.5, headY + (5*s) + tailWhip*0.5); 
-            ctx.fill();
+            ctx.moveTo(chestX, chestY - (15*s)); ctx.lineTo(rumpX, rumpY - (12*s));
+            ctx.lineTo(rumpX, rumpY + (12*s)); ctx.lineTo(chestX, chestY + (15*s)); ctx.fill();
+            ctx.beginPath(); ctx.arc(rumpX, rumpY, 16*s, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(chestX, chestY, 18*s, 0, Math.PI*2); ctx.fill();
+
+            // Neck and Head
+            let neckBaseX = chestX + (10*s);
+            let neckBaseY = chestY - (10*s);
+            let headDip = isMoving ? Math.sin(cycle) * 8 * s : 0;
+            headX = neckBaseX + (20*s) + (Math.cos(pitch)*10*s);
+            headY = neckBaseY - (25*s) + headDip;
+
+            ctx.strokeStyle = colorMain;
+            ctx.lineWidth = 14 * s;
+            ctx.beginPath(); ctx.moveTo(neckBaseX, neckBaseY); ctx.lineTo(headX - (5*s), headY + (5*s)); ctx.stroke();
+
+            // Mane (Flowing behind neck) if horse
+            if (animTypeInfo.tail === 'long') {
+                let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
+                let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
+                ctx.fillStyle = colorDark;
+                ctx.beginPath();
+                ctx.moveTo(neckBaseX - (5*s), neckBaseY - (10*s));
+                ctx.lineTo(headX - (10*s), headY - (5*s));
+                ctx.lineTo(headX - (25*s) - tailStretch*0.5, headY + (5*s) + tailWhip*0.5);
+                ctx.fill();
+            }
+
+            // Head Shape
+            ctx.fillStyle = colorMain;
+            ctx.beginPath();
+            ctx.moveTo(headX - (10*s), headY + (5*s)); ctx.lineTo(headX + (15*s), headY + (10*s));
+            ctx.lineTo(headX + (18*s), headY + (2*s)); ctx.lineTo(headX + (5*s), headY - (8*s));
+            ctx.lineTo(headX - (8*s), headY - (5*s)); ctx.fill();
+
+            ctx.fillStyle = colorDark;
+            ctx.beginPath(); ctx.moveTo(headX - (5*s), headY - (5*s)); ctx.lineTo(headX - (8*s), headY - (16*s) + (pitch*5*s)); ctx.lineTo(headX, headY - (5*s)); ctx.fill();
+
+            // Horns or Antlers
+            if (animTypeInfo.horns) {
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 3 * s;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(headX - 2*s, headY - 5*s);
+                ctx.quadraticCurveTo(headX + 15*s, headY - 15*s + headDip, headX + 22*s, headY - 20*s + headDip);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(headX, headY - 4*s);
+                ctx.quadraticCurveTo(headX + 18*s, headY - 12*s + headDip, headX + 25*s, headY - 18*s + headDip);
+                ctx.stroke();
+            } else if (animTypeInfo.antlers) {
+                ctx.fillStyle = '#d7ccc8';
+                ctx.strokeStyle = '#d7ccc8';
+                ctx.lineWidth = 2 * s;
+                ctx.beginPath();
+                ctx.moveTo(headX - 5*s, headY - 5*s);
+                ctx.lineTo(headX - 10*s, headY - 20*s + headDip);
+                ctx.lineTo(headX - 5*s, headY - 30*s + headDip);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(headX - 10*s, headY - 20*s + headDip);
+                ctx.lineTo(headX - 20*s, headY - 25*s + headDip);
+                ctx.stroke();
+
+                // Palmation
+                ctx.beginPath();
+                ctx.ellipse(headX - 12*s, headY - 25*s + headDip, 10*s, 6*s, Math.PI/4, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Near Legs
+            drawLimb(rumpX, rumpY + (5*s), nb.u, nb.l, 18*s, 22*s, 9*s, colorMain);
+            drawLimb(chestX, chestY + (5*s), nf.u, nf.l, 18*s, 22*s, 8*s, colorMain);
         }
-
-        // Head Shape
-        ctx.fillStyle = colorMain;
-        ctx.beginPath();
-        ctx.moveTo(headX - (10*s), headY + (5*s)); ctx.lineTo(headX + (15*s), headY + (10*s)); 
-        ctx.lineTo(headX + (18*s), headY + (2*s)); ctx.lineTo(headX + (5*s), headY - (8*s)); 
-        ctx.lineTo(headX - (8*s), headY - (5*s)); ctx.fill();
-        
-        ctx.fillStyle = colorDark;
-        ctx.beginPath(); ctx.moveTo(headX - (5*s), headY - (5*s)); ctx.lineTo(headX - (8*s), headY - (16*s) + (pitch*5*s)); ctx.lineTo(headX, headY - (5*s)); ctx.fill();
-
-        // Horns or Antlers
-        if (animTypeInfo.horns) {
-            ctx.strokeStyle = '#e0e0e0';
-            ctx.lineWidth = 3 * s;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(headX - 2*s, headY - 5*s);
-            ctx.quadraticCurveTo(headX + 15*s, headY - 15*s + headDip, headX + 22*s, headY - 20*s + headDip);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(headX, headY - 4*s);
-            ctx.quadraticCurveTo(headX + 18*s, headY - 12*s + headDip, headX + 25*s, headY - 18*s + headDip);
-            ctx.stroke();
-        } else if (animTypeInfo.antlers) {
-            ctx.fillStyle = '#d7ccc8';
-            ctx.strokeStyle = '#d7ccc8';
-            ctx.lineWidth = 2 * s;
-            ctx.beginPath();
-            ctx.moveTo(headX - 5*s, headY - 5*s);
-            ctx.lineTo(headX - 10*s, headY - 20*s + headDip);
-            ctx.lineTo(headX - 5*s, headY - 30*s + headDip);
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(headX - 10*s, headY - 20*s + headDip);
-            ctx.lineTo(headX - 20*s, headY - 25*s + headDip);
-            ctx.stroke();
-            
-            // Palmation
-            ctx.beginPath();
-            ctx.ellipse(headX - 12*s, headY - 25*s + headDip, 10*s, 6*s, Math.PI/4, 0, Math.PI*2);
-            ctx.fill();
-        }
-
-        // Near Legs
-        drawLimb(rumpX, rumpY + (5*s), nb.u, nb.l, 18*s, 22*s, 9*s, colorMain); 
-        drawLimb(chestX, chestY + (5*s), nf.u, nf.l, 18*s, 22*s, 8*s, colorMain);
 
         // --- COWBOY RIDER ---
         let riderColor = racer.riderColor;
         let riderSkin = '#ffccbc';
-        let riderBounce = isMoving ? Math.sin(cycle * 2 - 1.0) * 6 * s : 0;
-        let saddleX = pX - (5 * s);
-        let saddleY = bodyY - (15 * s);
-        let riderHipY = saddleY + riderBounce;
+        let rShape = racer.riderShape || 'normal';
+        let bodyWidth = rShape === 'large' ? 18 : (rShape === 'small' ? 8 : 12);
+        let armWidth = rShape === 'large' ? 8 : (rShape === 'small' ? 3 : 5);
+        let legWidth = rShape === 'large' ? 10 : (rShape === 'small' ? 5 : 8);
+        let heightMult = rShape === 'tall' ? 1.4 : (rShape === 'small' ? 0.8 : 1.0);
 
-        // Rider Back Leg
-        ctx.strokeStyle = darkenColor(riderColor, 40);
-        ctx.lineWidth = 7 * s;
-        ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (10*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (5*s), riderHipY + (30*s)); ctx.stroke();
+        if (animTypeInfo.isHuman) {
+            let runnerX = pX;
+            let runnerY = pY + (5 * s); // Ground level
 
-        let lean = isMoving ? 0.4 + (racer.speed / racer.maxSpeed) * 0.4 : 0.1; 
-        let shoulderX = saddleX + Math.sin(lean) * 25 * s;
-        let shoulderY = riderHipY - Math.cos(lean) * 25 * s;
-        
-        ctx.strokeStyle = riderColor;
-        ctx.lineWidth = 12 * s;
-        ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
+            let sprintSpeed = racer.speed / racer.maxSpeed;
+            // Phase adjustment for rapid footfalls
+            let p1 = (racer.phase * 2) % 1.0;
+            let p2 = (racer.phase * 2 + 0.5) % 1.0;
 
-        let headCenterX = shoulderX + (5*s);
-        let headCenterY = shoulderY - (8*s);
-        ctx.fillStyle = riderSkin;
-        ctx.beginPath(); ctx.arc(headCenterX, headCenterY, 6*s, 0, Math.PI*2); ctx.fill();
-        
-        ctx.fillStyle = '#4e342e';
-        ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), 14*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), 7*s, Math.PI, 0); ctx.fill();
+            // Helper to build realistic foot trajectory (ellipse-like)
+            function getFootPos(t) {
+                // Return {x, y} relative to runnerX, runnerY based on 0-1 cycle
+                // t=0 is planting foot forward, t=0.5 is sweeping back, t=1 is snapping forward again
+                let stride = isMoving ? 45 * s * (0.5 + sprintSpeed * 0.5) : 10 * s;
+                let lift = isMoving ? 30 * s * (0.3 + sprintSpeed * 0.7) : 0;
 
-        let handX = headX - (5*s); 
-        let handY = headY - (5*s);
-        
-        ctx.strokeStyle = '#3e2723';
-        ctx.lineWidth = 2 * s;
-        ctx.beginPath(); ctx.moveTo(handX, handY); ctx.lineTo(headX + (10*s), headY + (5*s)); ctx.stroke();
+                let fx, fy;
+                if (t < 0.5) {
+                    // Foot sweeping back on ground
+                    let sweepT = t / 0.5; // 0 to 1
+                    fx = Math.cos(sweepT * Math.PI) * stride; // stride to -stride
+                    fy = 0;
+                } else {
+                    // Foot recovering in air
+                    let airT = (t - 0.5) / 0.5; // 0 to 1
+                    fx = Math.cos(Math.PI + airT * Math.PI) * stride; // -stride to stride
+                    fy = -Math.sin(airT * Math.PI) * lift; // Up and down
+                }
+                return { x: runnerX + fx, y: runnerY + fy };
+            }
 
-        ctx.strokeStyle = riderColor;
-        ctx.lineWidth = 5 * s;
-        ctx.beginPath(); ctx.moveTo(shoulderX, shoulderY); ctx.lineTo(shoulderX + (5*s), shoulderY + (10*s)); ctx.lineTo(handX, handY); ctx.stroke();
+            let foot1 = getFootPos(p1);
+            let foot2 = getFootPos(p2);
 
-        ctx.strokeStyle = riderColor;
-        ctx.lineWidth = 8 * s;
-        ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (12*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (8*s), riderHipY + (32*s)); ctx.stroke();
-        ctx.fillStyle = '#212121';
-        ctx.beginPath(); ctx.arc(saddleX + (10*s), riderHipY + (32*s), 4*s, 0, Math.PI*2); ctx.fill();
+            // Calculate Hip Bounce (hips drop when feet are spread, rise when legs cross)
+            let bounceScale = isMoving ? 8 * s * (0.5 + sprintSpeed * 0.5) : 0;
+            // The lowest point is t=0.25 and 0.75, highest is t=0 and 0.5
+            let bounce1 = Math.sin(p1 * Math.PI * 2);
+            let runnerBounce = isMoving ? Math.abs(bounce1) * bounceScale : 0;
 
-        // Name Tag
-        ctx.fillStyle = 'white';
-        ctx.font = `bold ${14*s}px Georgia`;
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
-        ctx.fillText(racer.name, pX, riderHipY - (40*s));
-        ctx.shadowBlur = 0; 
-        ctx.textAlign = 'left';
+            // The leg lengths
+            let thighLen = 22 * s * heightMult;
+            let calfLen = 22 * s * heightMult;
+
+            // Base hip height slightly below full leg extension
+            let hipY = runnerY - (thighLen + calfLen) * 0.9 + runnerBounce;
+            let hipX = runnerX;
+
+            let lean = isMoving ? 0.3 + sprintSpeed * 0.5 : 0.05;
+            let torsoLen = 30 * s * heightMult;
+            let shoulderX = hipX + Math.sin(lean) * torsoLen;
+            let shoulderY = hipY - Math.cos(lean) * torsoLen;
+
+            let armLen1 = 15 * s * heightMult;
+            let armLen2 = 15 * s * heightMult;
+
+            // Arm swinging (opposite to legs)
+            // If foot1 is forward (p1 near 0 or 1), hand1 is backward
+            function getHandPos(t) {
+                let swing = isMoving ? 35 * s * (0.4 + sprintSpeed * 0.6) : 5 * s;
+                let armAng = Math.cos(t * Math.PI * 2) * Math.PI * 0.6; // Angle relative to torso
+
+                // Pure sine swing is too rigid, adding an offset to bend elbow
+                let hx = shoulderX - Math.cos(armAng) * swing;
+                // Hands should come up towards chest when forward, drop down when back
+                let hy = shoulderY + 15 * s + Math.sin(armAng) * swing * 0.5;
+
+                return { x: hx, y: hy };
+            }
+
+            let hand1 = getHandPos(p1);
+            let hand2 = getHandPos(p2);
+
+            // DRAWING BACK LAYER
+            // Back Arm (hand2 pairs with foot2, opposite of foot1)
+            drawIKLimb(shoulderX, shoulderY, hand2.x, hand2.y, armLen1, armLen2, armWidth * s, darkenColor(riderSkin, 20), false);
+
+            // Back Leg (foot2)
+            drawIKLimb(hipX, hipY, foot2.x, foot2.y, thighLen, calfLen, legWidth * s, darkenColor(riderColor, 40), true);
+
+            // Body
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = bodyWidth * s;
+            ctx.beginPath(); ctx.moveTo(hipX, hipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
+
+            // Head
+            let headCenterX = shoulderX + Math.sin(lean) * (8*s);
+            let headCenterY = shoulderY - Math.cos(lean) * (8*s);
+            let headSize = rShape === 'large' ? 8 : (rShape === 'small' ? 5 : 6);
+            ctx.fillStyle = riderSkin;
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), headSize*2.3*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), headSize*1.2*s, Math.PI, 0); ctx.fill();
+
+            // DRAWING FRONT LAYER
+            // Front Leg (foot1)
+            drawIKLimb(hipX, hipY, foot1.x, foot1.y, thighLen, calfLen, legWidth * s, riderColor, true);
+
+            // Front Arm (hand1)
+            drawIKLimb(shoulderX, shoulderY, hand1.x, hand1.y, armLen1, armLen2, armWidth * s, riderSkin, false);
+
+            // Name Tag
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.fillText(racer.name, runnerX, hipY - (45*s) - runnerBounce);
+            ctx.shadowBlur = 0;
+            ctx.textAlign = 'left';
+
+        } else {
+            let riderBounce = isMoving ? Math.sin(cycle * 2 - 1.0) * 6 * s : 0;
+            let saddleX = pX - (5 * s);
+            let saddleY = bodyY - (15 * s);
+            let riderHipY = saddleY + riderBounce;
+
+            // Rider Back Leg
+            ctx.strokeStyle = darkenColor(riderColor, 40);
+            ctx.lineWidth = legWidth * s;
+            ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (10*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (5*s), riderHipY + (30*s)); ctx.stroke();
+
+            let lean = isMoving ? 0.4 + (racer.speed / racer.maxSpeed) * 0.4 : 0.1;
+            let shoulderX = saddleX + Math.sin(lean) * 25 * s * heightMult;
+            let shoulderY = riderHipY - Math.cos(lean) * 25 * s * heightMult;
+
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = bodyWidth * s;
+            ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
+
+            let headCenterX = shoulderX + (5*s);
+            let headCenterY = shoulderY - (8*s);
+            let headSize = rShape === 'large' ? 8 : (rShape === 'small' ? 5 : 6);
+            ctx.fillStyle = riderSkin;
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill();
+
+            ctx.fillStyle = '#4e342e';
+            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), headSize*2.3*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), headSize*1.2*s, Math.PI, 0); ctx.fill();
+
+            let handX = headX - (5*s);
+            let handY = headY - (5*s);
+
+            ctx.strokeStyle = '#3e2723';
+            ctx.lineWidth = 2 * s;
+            ctx.beginPath(); ctx.moveTo(handX, handY); ctx.lineTo(headX + (10*s), headY + (5*s)); ctx.stroke();
+
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = armWidth * s;
+            ctx.beginPath(); ctx.moveTo(shoulderX, shoulderY); ctx.lineTo(shoulderX + (5*s), shoulderY + (10*s)); ctx.lineTo(handX, handY); ctx.stroke();
+
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = (legWidth+1) * s;
+            ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (12*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (8*s), riderHipY + (32*s)); ctx.stroke();
+            ctx.fillStyle = '#212121';
+            ctx.beginPath(); ctx.arc(saddleX + (10*s), riderHipY + (32*s), 4*s, 0, Math.PI*2); ctx.fill();
+
+            // Name Tag
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.fillText(racer.name, pX, riderHipY - (40*s));
+            ctx.shadowBlur = 0;
+            ctx.textAlign = 'left';
+        }
     }
 
     function drawFloatingTexts() {
@@ -1074,8 +1562,11 @@
         ctx.fillText(`SPEED: ${Math.round(p.speed / 100)} km/h`, 20, 65);
 
         let flash = p.flashTimer > 0 && Math.floor(p.flashTimer / 3) % 2 === 0;
+        let isSmallScreen = width < 500;
+        let stamX = isSmallScreen ? width - 150 : width - 250;
+
         ctx.fillStyle = flash ? '#ff3300' : '#ffcc80';
-        ctx.fillText(`STAMINA`, width - 250, 35);
+        if (!isSmallScreen) ctx.fillText(`STAMINA`, stamX, 35);
         
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#3e2723';
@@ -1099,7 +1590,7 @@
         ctx.fillText(`TRACK`, 20, height - 20);
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'rgba(30, 20, 15, 0.8)';
-        let barW = width - 120;
+        let barW = width - 140;
         ctx.fillRect(100, height - 35, barW, 20);
         
         ctx.strokeStyle = '#5d4037';

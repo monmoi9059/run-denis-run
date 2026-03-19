@@ -307,6 +307,38 @@
     let animalUpgrades = {
         human: { speed: 1, accel: 1, stamina: 1, assist: 1 }
     };
+
+    function saveGame() {
+        const saveData = {
+            money: money,
+            animalUpgrades: animalUpgrades,
+            unlockedAnimals: unlockedAnimals,
+            selectedAnimal: selectedAnimal,
+            unlockedRiders: unlockedRiders,
+            selectedRider: selectedRider,
+            currentTourney: currentTourney
+        };
+        localStorage.setItem('rdr_save', JSON.stringify(saveData));
+    }
+
+    function loadGame() {
+        try {
+            const saved = localStorage.getItem('rdr_save');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.money !== undefined) money = data.money;
+                if (data.animalUpgrades) animalUpgrades = data.animalUpgrades;
+                if (data.unlockedAnimals) unlockedAnimals = data.unlockedAnimals;
+                if (data.selectedAnimal) selectedAnimal = data.selectedAnimal;
+                if (data.unlockedRiders) unlockedRiders = data.unlockedRiders;
+                if (data.selectedRider) selectedRider = data.selectedRider;
+                if (data.currentTourney !== undefined) currentTourney = data.currentTourney;
+            }
+        } catch (e) {
+            console.error("Failed to load save data:", e);
+        }
+    }
+
     function getUpgrades(animalKey) {
         if (!animalUpgrades[animalKey]) {
             animalUpgrades[animalKey] = { speed: 1, accel: 1, stamina: 1, assist: 1 };
@@ -513,12 +545,14 @@
             selectedRider = key;
             document.getElementById('rider-select').value = key;
             updateShopUI();
+            saveGame();
         } else if (money >= rider.cost) {
             money -= rider.cost;
             unlockedRiders.push(key);
             selectedRider = key;
             document.getElementById('rider-select').value = key;
             updateShopUI();
+            saveGame();
         }
     }
 
@@ -556,12 +590,14 @@
             selectedAnimal = key;
             document.getElementById('mount-select').value = key;
             updateShopUI();
+            saveGame();
         } else if (money >= anim.cost) {
             money -= anim.cost;
             unlockedAnimals.push(key);
             selectedAnimal = key;
             document.getElementById('mount-select').value = key;
             updateShopUI();
+            saveGame();
         }
     }
 
@@ -572,6 +608,7 @@
             money -= cost;
             upgrades[type]++;
             updateShopUI();
+            saveGame();
         }
     }
 
@@ -973,6 +1010,7 @@
         
         document.getElementById('prize-display').innerText = prize;
         money += prize;
+        saveGame();
     }
 
     // --- RENDERING ---
@@ -1669,6 +1707,7 @@
     }
 
     // --- START ---
+    loadGame();
     openShop();
     
     function loop(time) {

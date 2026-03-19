@@ -309,43 +309,44 @@
 
     // --- ANIMAL TYPES ---
     const ANIMAL_TYPES = {
-        human: { name: "Sprint on Foot", cost: 0, spd: 1800, acc: 600, drain: 1.5, reg: 1.5, color: '#ffffff', scale: 1.0, isHuman: true, desc: "Just you, running. No mount." },
-        horse: { name: "Quarter Horse", cost: 20, spd: 10000, acc: 2000, drain: 3.0, reg: 0.8, color: '#8d6e63', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Balanced speed and stamina." },
-        donkey: { name: "Stubborn Donkey", cost: 50, spd: 7500, acc: 1500, drain: 2.0, reg: 1.2, color: '#9e9e9e', scale: 0.8, horns: false, antlers: false, tail: 'thin', desc: "Slow, but rarely gets tired." },
-        zebra: { name: "Savannah Zebra", cost: 150, spd: 10500, acc: 2200, drain: 3.0, reg: 0.8, color: '#e0e0e0', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Slightly faster than a horse." },
-        pig: { name: "Giant Farm Pig", cost: 300, spd: 8000, acc: 5000, drain: 4.0, reg: 1.0, color: '#f8bbd0', scale: 0.7, horns: false, antlers: false, tail: 'thin', desc: "Incredible burst, very short legs." },
-        bull: { name: "Brahma Bull", cost: 400, spd: 8500, acc: 3800, drain: 4.0, reg: 1.0, color: '#3e2723', scale: 1.15, horns: true, antlers: false, tail: 'thin', desc: "Massive acceleration, poor top speed." },
-        corgi: { name: "Royal Corgi", cost: 600, spd: 11000, acc: 1500, drain: 2.5, reg: 0.9, color: '#ffb74d', scale: 0.5, horns: false, antlers: false, tail: 'stub', desc: "Tiny, bouncy, surprisingly fast." },
-        wolf: { name: "Timber Wolf", cost: 800, spd: 11500, acc: 3000, drain: 3.5, reg: 1.1, color: '#757575', scale: 0.9, horns: false, antlers: false, tail: 'long', desc: "Predatory acceleration." },
-        moose: { name: "Laurentian Moose", cost: 1000, spd: 12500, acc: 1200, drain: 2.5, reg: 0.6, color: '#5d4037', scale: 1.35, horns: false, antlers: true, tail: 'stub', desc: "Incredible top speed, slow to start." },
-        bear: { name: "Grizzly Bear", cost: 1200, spd: 9500, acc: 4500, drain: 4.5, reg: 1.2, color: '#4e342e', scale: 1.2, horns: false, antlers: false, tail: 'stub', desc: "Heavy hitter, massive impact." },
-        camel: { name: "Desert Camel", cost: 1500, spd: 11800, acc: 2000, drain: 1.5, reg: 1.5, color: '#c2b280', scale: 1.2, horns: false, antlers: false, tail: 'thin', desc: "The ultimate stamina machine." },
-        lion: { name: "Golden Lion", cost: 2000, spd: 13000, acc: 3500, drain: 3.8, reg: 1.0, color: '#e5c158', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "King of the sprint." },
-        caribou: { name: "Tundra Caribou", cost: 2500, spd: 13500, acc: 2500, drain: 2.8, reg: 0.8, color: '#a1887f', scale: 1.1, horns: false, antlers: true, tail: 'stub', desc: "Majestic speed across the ice." },
-        beaver: { name: "Lévis Giant Beaver", cost: 3500, spd: 14000, acc: 4200, drain: 3.5, reg: 1.0, color: '#8d6e63', scale: 0.85, horns: false, antlers: false, tail: 'stub', desc: "A terrifying local legend." },
-        turtle: { name: "Snapping Turtle", cost: 5000, spd: 15500, acc: 500, drain: 1.0, reg: 2.0, color: '#4caf50', scale: 0.6, horns: false, antlers: false, tail: 'stub', desc: "Takes forever to start, impossible to stop." },
-        tiger: { name: "Bengal Tiger", cost: 6500, spd: 14500, acc: 3800, drain: 4.0, reg: 1.0, color: '#e57373', scale: 1.05, horns: false, antlers: false, tail: 'long', desc: "Fearsome velocity." },
-        elephant: { name: "War Elephant", cost: 8000, spd: 15000, acc: 5000, drain: 6.0, reg: 0.5, color: '#9e9e9e', scale: 1.6, horns: true, antlers: false, tail: 'thin', desc: "Earth-shaking power, terrible cardio." },
-        triceratops: { name: "Triceratops", cost: 12000, spd: 16000, acc: 4500, drain: 3.5, reg: 0.9, color: '#81c784', scale: 1.4, horns: true, antlers: false, tail: 'long', desc: "Dinosaur logic. Don't question it." },
-        unicorn: { name: "Mystic Unicorn", cost: 20000, spd: 18000, acc: 6000, drain: 1.5, reg: 2.0, color: '#f8bbd0', scale: 1.0, horns: true, antlers: false, tail: 'long', desc: "The ultimate magical mount." }
+
+        human: { name: "Sprint on Foot", runStyle: 'gallop', cost: 0, spd: 1800, acc: 600, drain: 1.5, reg: 1.5, color: '#ffffff', scale: 1.0, isHuman: true, desc: "Just you, running. No mount." },
+        horse: { name: "Quarter Horse", runStyle: 'gallop', cost: 20, spd: 8800, acc: 1500, drain: 2.5, reg: 1.0, color: '#8d6e63', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Balanced realistic speed (~88 km/h)." },
+        donkey: { name: "Stubborn Donkey", runStyle: 'gallop', cost: 50, spd: 5500, acc: 1000, drain: 1.5, reg: 1.5, color: '#9e9e9e', scale: 0.8, horns: false, antlers: false, tail: 'thin', desc: "Slower but highly resilient (~55 km/h)." },
+        zebra: { name: "Savannah Zebra", runStyle: 'gallop', cost: 150, spd: 6500, acc: 1800, drain: 2.8, reg: 0.9, color: '#e0e0e0', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "Wild and swift (~65 km/h)." },
+        pig: { name: "Giant Farm Pig", runStyle: 'waddle', cost: 300, spd: 1800, acc: 800, drain: 3.5, reg: 1.0, color: '#f8bbd0', scale: 0.7, horns: false, antlers: false, tail: 'thin', desc: "Realistic pig speeds (~18 km/h). Slow." },
+        bull: { name: "Brahma Bull", runStyle: 'lumber', cost: 400, spd: 4000, acc: 2500, drain: 4.0, reg: 0.8, color: '#3e2723', scale: 1.15, horns: true, antlers: false, tail: 'thin', desc: "Massive acceleration, poor top speed." },
+        corgi: { name: "Royal Corgi", runStyle: 'waddle', cost: 600, spd: 4000, acc: 1200, drain: 2.0, reg: 1.2, color: '#ffb74d', scale: 0.5, horns: false, antlers: false, tail: 'stub', desc: "Short legs, decent burst." },
+        wolf: { name: "Timber Wolf", runStyle: 'bound', cost: 800, spd: 6000, acc: 2200, drain: 3.0, reg: 1.3, color: '#757575', scale: 0.9, horns: false, antlers: false, tail: 'long', desc: "Predatory sprint (~60 km/h)." },
+        moose: { name: "Laurentian Moose", runStyle: 'gallop', cost: 1000, spd: 5500, acc: 1200, drain: 2.2, reg: 0.8, color: '#5d4037', scale: 1.35, horns: false, antlers: true, tail: 'stub', desc: "Heavy but surprisingly fast (~55 km/h)." },
+        bear: { name: "Grizzly Bear", runStyle: 'lumber', cost: 1200, spd: 5000, acc: 2800, drain: 4.5, reg: 1.0, color: '#4e342e', scale: 1.2, horns: false, antlers: false, tail: 'stub', desc: "Heavy hitter, massive impact." },
+        camel: { name: "Desert Camel", runStyle: 'gallop', cost: 1500, spd: 6500, acc: 1200, drain: 1.2, reg: 1.8, color: '#c2b280', scale: 1.2, horns: false, antlers: false, tail: 'thin', desc: "The ultimate stamina machine." },
+        lion: { name: "Golden Lion", runStyle: 'bound', cost: 2000, spd: 8000, acc: 3500, drain: 5.0, reg: 0.6, color: '#e5c158', scale: 1.0, horns: false, antlers: false, tail: 'long', desc: "High top speed, terrible stamina." },
+        caribou: { name: "Tundra Caribou", runStyle: 'gallop', cost: 2500, spd: 8000, acc: 2000, drain: 2.5, reg: 1.0, color: '#a1887f', scale: 1.1, horns: false, antlers: true, tail: 'stub', desc: "Majestic speed across the ice." },
+        beaver: { name: "Lévis Giant Beaver", runStyle: 'waddle', cost: 3500, spd: 2000, acc: 1500, drain: 3.0, reg: 1.0, color: '#8d6e63', scale: 0.85, horns: false, antlers: false, tail: 'stub', desc: "A terrifying local legend." },
+        turtle: { name: "Snapping Turtle", runStyle: 'waddle', cost: 5000, spd: 500, acc: 300, drain: 0.5, reg: 2.5, color: '#4caf50', scale: 0.6, horns: false, antlers: false, tail: 'stub', desc: "Slowest mount in the west (~5 km/h)." },
+        tiger: { name: "Bengal Tiger", runStyle: 'bound', cost: 6500, spd: 6500, acc: 3000, drain: 4.5, reg: 0.8, color: '#e57373', scale: 1.05, horns: false, antlers: false, tail: 'long', desc: "Fearsome velocity." },
+        elephant: { name: "War Elephant", runStyle: 'lumber', cost: 8000, spd: 4000, acc: 1500, drain: 3.5, reg: 0.5, color: '#9e9e9e', scale: 1.6, horns: true, antlers: false, tail: 'thin', desc: "Earth-shaking power, terrible cardio." },
+        triceratops: { name: "Triceratops", runStyle: 'lumber', cost: 12000, spd: 3000, acc: 1200, drain: 2.5, reg: 0.8, color: '#81c784', scale: 1.4, horns: true, antlers: false, tail: 'long', desc: "Extinct, huge, logically quite slow." },
+        unicorn: { name: "Mystic Unicorn", runStyle: 'gallop', cost: 20000, spd: 9500, acc: 4000, drain: 1.5, reg: 2.0, color: '#f8bbd0', scale: 1.0, horns: true, antlers: false, tail: 'long', desc: "The ultimate magical mount." }
     };
     let unlockedAnimals = ['human'];
     let selectedAnimal = 'human';
     
     // Opponents / Tournaments
     const tournaments = [
-        { name: "Farmhand Sprint", prize: 100, length: 150000,
-          ai: [ { name: "Rusty", anim: 'donkey', color: '#9e9e9e', riderColor: '#4e342e', baseSpeed: 9000, perfChance: 0.3 }, 
-                { name: "Greasy Pete", anim: 'pig', color: '#f8bbd0', riderColor: '#3e2723', baseSpeed: 8000, perfChance: 0.2 } ] },
-        { name: "Lévis Regional", prize: 250, length: 200000,
-          ai: [ { name: "Quebec Trotter", anim: 'horse', color: '#d7ccc8', riderColor: '#1b5e20', baseSpeed: 11500, perfChance: 0.5 }, 
-                { name: "River Monster", anim: 'beaver', color: '#8d6e63', riderColor: '#b71c1c', baseSpeed: 11000, perfChance: 0.6 } ] },
-        { name: "Outlaw Dash", prize: 500, length: 250000,
-          ai: [ { name: "Bandit's Wolf", anim: 'wolf', color: '#757575', riderColor: '#212121', baseSpeed: 13500, perfChance: 0.7 }, 
-                { name: "Wild Moose", anim: 'moose', color: '#4e342e', riderColor: '#000000', baseSpeed: 14500, perfChance: 0.6 } ] },
-        { name: "The Grand Champion", prize: 1000, length: 300000,
-          ai: [ { name: "Jurassic Rider", anim: 'triceratops', color: '#81c784', riderColor: '#ffb300', baseSpeed: 16500, perfChance: 0.9 }, 
-                { name: "Star Weaver", anim: 'unicorn', color: '#f8bbd0', riderColor: '#1565c0', baseSpeed: 17000, perfChance: 0.85 } ] }
+        { name: "Farmhand Sprint", prize: 100, length: 80000,
+          ai: [ { name: "Rusty", anim: 'donkey', color: '#9e9e9e', riderColor: '#4e342e', baseSpeed: 5000, perfChance: 0.3 },
+                { name: "Greasy Pete", anim: 'pig', color: '#f8bbd0', riderColor: '#3e2723', baseSpeed: 1800, perfChance: 0.2 } ] },
+        { name: "Lévis Regional", prize: 250, length: 100000,
+          ai: [ { name: "Wild Moose", anim: 'moose', color: '#5d4037', riderColor: '#1b5e20', baseSpeed: 5500, perfChance: 0.5 },
+                { name: "Striped Runner", anim: 'zebra', color: '#e0e0e0', riderColor: '#b71c1c', baseSpeed: 6500, perfChance: 0.6 } ] },
+        { name: "Outlaw Dash", prize: 500, length: 120000,
+          ai: [ { name: "Bandit's Wolf", anim: 'wolf', color: '#757575', riderColor: '#212121', baseSpeed: 6000, perfChance: 0.7 },
+                { name: "Fearsome Tiger", anim: 'tiger', color: '#e57373', riderColor: '#000000', baseSpeed: 6500, perfChance: 0.6 } ] },
+        { name: "The Grand Champion", prize: 1000, length: 150000,
+          ai: [ { name: "King of Sprint", anim: 'lion', color: '#e5c158', riderColor: '#ffb300', baseSpeed: 8000, perfChance: 0.9 },
+                { name: "Star Weaver", anim: 'unicorn', color: '#f8bbd0', riderColor: '#1565c0', baseSpeed: 9500, perfChance: 0.85 } ] }
     ];
     let currentTourney = 0;
 
@@ -646,16 +647,16 @@
 
         racers = [
             { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: ai1AnimType, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor, riderShape: 'normal',
-              y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, maxSpeed: ai1BaseSpeed,
+              y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: ai1BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: ai1PerfChance, finished: false, finishTime: 0 },
             
             { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
-              y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, maxSpeed: playerMaxSpeed, 
+              y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: playerMaxSpeed,
               accel: playerAccel, assist: playerAssist, stamDrain: pStamDrain, stamRegen: pStamRegen,
               phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
               
             { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: ai2AnimType, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor, riderShape: 'normal',
-              y: height - 60, scale: ANIMAL_TYPES[ai2AnimType].scale * 1.3, dist: 0, speed: 0, maxSpeed: ai2BaseSpeed,
+              y: height - 60, scale: ANIMAL_TYPES[ai2AnimType].scale * 1.3, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: ai2BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: ai2PerfChance, finished: false, finishTime: 0 }
         ];
     }
@@ -672,8 +673,8 @@
         let textY = p.y - 120;
         
         if (p.stamina >= p.stamDrain) {
-            // TAP TO SPRINT MECHANIC
-            p.speed = Math.min(p.speed + (p.accel * p.assist), p.maxSpeed);
+            // TAP TO SPRINT MECHANIC: Add to a target momentum, smoothed out in update loop
+            p.targetSpeed = Math.min(p.targetSpeed + (p.accel * p.assist * 1.5), p.maxSpeed * 1.1);
             p.stamina -= p.stamDrain;
             spawnDust(p);
             
@@ -740,23 +741,39 @@
                         
                         if (Math.random() < tapProb) {
                             let aiAccel = ANIMAL_TYPES[r.animType].acc;
-                            r.speed = Math.min(r.speed + aiAccel, r.maxSpeed);
+                            r.targetSpeed = Math.min(r.targetSpeed + aiAccel * 1.5, r.maxSpeed * 1.1);
                             r.stamina -= 1.5; 
                             spawnDust(r);
                         }
                     }
                 }
 
+                // Smoothly accelerate towards target speed
+                if (r.targetSpeed > r.speed) {
+                    let accAmount = r.isPlayer ? r.accel * r.assist : ANIMAL_TYPES[r.animType].acc;
+                    r.speed += accAmount * step * 4.0; // Acceleration factor
+                    if (r.speed > r.maxSpeed) r.speed = r.maxSpeed;
+                }
+
+                // Dynamic Friction & Realistic Aerodynamic Drag (proportional to v^2)
+                let friction = 500 * step; // Ground rolling friction
+                let aeroDrag = (r.speed * r.speed) / (r.maxSpeed * 3.0) * step; // Air resistance
+                let totalDrag = friction + aeroDrag;
+
+                // Decay target speed gradually
+                r.targetSpeed = Math.max(r.targetSpeed - (totalDrag * 2), 0);
+
+                // Apply drag to actual speed if we aren't pushing forward
+                if (r.speed > r.targetSpeed) {
+                    r.speed = Math.max(r.speed - totalDrag, r.targetSpeed);
+                }
+                r.speed = Math.max(r.speed, 0);
+
                 let baseRate = 0.8;
                 let maxRate = 3.5;
                 let currentRate = baseRate + (r.speed / r.maxSpeed) * (maxRate - baseRate);
                 r.phase += currentRate * step;
                 if (r.phase >= 1.0) r.phase -= 1.0;
-
-                // Dynamic Friction & Drag 
-                let dragBase = (r.speed * r.speed) / (r.maxSpeed * 1.5); 
-                let drag = Math.max(dragBase, 1500) * step; 
-                r.speed = Math.max(r.speed - drag, 0); 
                 
                 // Stamina Regen 
                 let regen = r.isPlayer ? r.stamRegen : 0.8;
@@ -768,6 +785,7 @@
                 if (r.isPlayer && r.flashTimer > 0) r.flashTimer--;
 
             } else {
+                r.targetSpeed = 0;
                 r.speed = Math.max(r.speed - 150, 0);
                 if (r.speed > 0) {
                     let rate = 0.8 + (r.speed / r.maxSpeed) * (3.5 - 0.8);
@@ -901,24 +919,50 @@
 
     function drawEnvironment(playerDist) {
         let skyGradient = ctx.createLinearGradient(0, 0, 0, height - 100);
-        skyGradient.addColorStop(0, '#1c0a35'); 
-        skyGradient.addColorStop(0.4, '#801a3c'); 
-        skyGradient.addColorStop(0.7, '#d64d30'); 
-        skyGradient.addColorStop(1, '#ffb74d'); 
+        skyGradient.addColorStop(0, '#0f0c29'); // Deep space
+        skyGradient.addColorStop(0.3, '#302b63'); // Dark purple
+        skyGradient.addColorStop(0.6, '#801a3c'); // Red sunset
+        skyGradient.addColorStop(1, '#ffb74d'); // Orange horizon
         ctx.fillStyle = skyGradient;
         ctx.fillRect(0, 0, width, height - 100);
 
+        // Draw stars
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        for(let i=0; i<40; i++) {
+            let starX = (i * 87 + playerDist * 0.005) % width;
+            let starY = (i * 37) % (height - 200);
+            ctx.fillRect(starX, starY, 2, 2);
+        }
+
+        // Draw Sun/Moon
         ctx.fillStyle = '#ffecb3';
         ctx.shadowColor = '#ffb74d';
         ctx.shadowBlur = 50;
         ctx.beginPath();
-        ctx.arc(width/2, height - 150, 60, 0, Math.PI*2);
+        let sunX = width/2 + (playerDist * -0.01) % 100; // slight move
+        ctx.arc(sunX, height - 150, 60, 0, Math.PI*2);
         ctx.fill();
         ctx.shadowBlur = 0;
 
+
+        // Distant Mountains
+        let numDistMtns = Math.ceil(width / 300) + 2;
+        let distMtnOffset = (playerDist * 0.015) % 800;
+        ctx.fillStyle = '#2a1a2e';
+        for(let i = -1; i < numDistMtns; i++) {
+            let x = (i * 300) - distMtnOffset;
+            ctx.beginPath();
+            ctx.moveTo(x - 100, height - 100);
+            ctx.lineTo(x + 100, height - 250);
+            ctx.lineTo(x + 150, height - 240);
+            ctx.lineTo(x + 300, height - 100);
+            ctx.fill();
+        }
+
+        // Mid Mountains
         let numMtns = Math.ceil(width / 400) + 2;
-        let mtnOffset = (playerDist * 0.03) % 800;
-        ctx.fillStyle = '#210f21'; 
+        let mtnOffset = (playerDist * 0.04) % 800;
+        ctx.fillStyle = '#1e0f1e';
         for(let i = -1; i < numMtns; i++) {
             let x = (i * 400) - mtnOffset;
             ctx.beginPath();
@@ -929,31 +973,42 @@
             ctx.fill();
         }
 
+        // Trees
         let numTrees = Math.ceil(width / 200) + 2;
-        let treeOffset = (playerDist * 0.1) % 400;
-        ctx.fillStyle = '#140814';
+        let treeOffset = (playerDist * 0.15) % 400;
+        ctx.fillStyle = '#100510';
         for(let i = -1; i < numTrees; i++) {
             let x = (i * 200) - treeOffset;
             ctx.beginPath();
             ctx.moveTo(x + 20, height - 100);
-            ctx.lineTo(x + 80, height - 200);
-            ctx.lineTo(x + 100, height - 180);
-            ctx.lineTo(x + 150, height - 220);
-            ctx.lineTo(x + 180, height - 100);
+            ctx.lineTo(x + 60, height - 220); // taller, thinner pines
+            ctx.lineTo(x + 100, height - 200);
+            ctx.lineTo(x + 130, height - 250);
+            ctx.lineTo(x + 160, height - 100);
             ctx.fill();
         }
 
+        // Detailed Ground Gradient
         let groundGrad = ctx.createLinearGradient(0, height - 150, 0, height);
-        groundGrad.addColorStop(0, '#2e1911');
-        groundGrad.addColorStop(1, '#170a05');
+        groundGrad.addColorStop(0, '#3e2215');
+        groundGrad.addColorStop(0.3, '#2a160d');
+        groundGrad.addColorStop(1, '#0c0502');
         ctx.fillStyle = groundGrad; 
         ctx.fillRect(0, height - 150, width, 150);
 
-        let numGround = Math.ceil(width / 150) + 2;
-        let groundOffset = (playerDist * 0.8) % 150;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+
+        // Ground Details (grass/dirt lines)
+        let numGround = Math.ceil(width / 200) + 2;
+        let groundOffset = (playerDist * 0.8) % 200;
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
         for(let i = -1; i < numGround; i++) {
-            ctx.fillRect((i * 150) - groundOffset, height - 150, 40, 150);
+            let gx = (i * 200) - groundOffset;
+            ctx.beginPath();
+            ctx.moveTo(gx, height - 150);
+            ctx.lineTo(gx + 30, height - 130);
+            ctx.lineTo(gx + 100, height - 130);
+            ctx.lineTo(gx + 150, height - 150);
+            ctx.fill();
         }
     }
 
@@ -1039,11 +1094,56 @@
 
         let cycle = isMoving ? racer.phase * Math.PI * 2 : 0;
         
-        // --- ANIMAL MECHANICS ---
-        let bounce = isMoving ? Math.sin(cycle * 2) * 4 * s : 0; 
-        let pitch = isMoving ? Math.cos(cycle) * 0.15 : 0;
-        let bodyY = pY - (35 * s) - bounce;
+        // --- SPECIFIC RUNNING MOTIONS ---
+        let runStyle = animTypeInfo.runStyle || 'gallop';
+        let bounce = 0; let pitch = 0;
+        let fb, nb, ff, nf;
 
+        if (runStyle === 'gallop') {
+            // Realistic horse gallop (4-beat or 3-beat feel)
+            // Back legs push together (slightly offset), then front legs land.
+            bounce = isMoving ? Math.sin(cycle * 2) * 5 * s : 0;
+            pitch = isMoving ? Math.cos(cycle + Math.PI/4) * 0.2 : 0;
+
+            fb = {u: Math.sin(cycle)*0.7 - 0.2, l: Math.sin(cycle)>0 ? Math.sin(cycle)*1.2 : 0};
+            nb = {u: Math.sin(cycle - 0.3)*0.7 - 0.2, l: Math.sin(cycle - 0.3)>0 ? Math.sin(cycle - 0.3)*1.2 : 0};
+            ff = {u: Math.sin(cycle + Math.PI)*0.8 + 0.1, l: Math.sin(cycle + Math.PI)>0 ? -Math.sin(cycle + Math.PI)*1.6 : Math.sin(cycle + Math.PI)*0.2};
+            nf = {u: Math.sin(cycle + Math.PI - 0.3)*0.8 + 0.1, l: Math.sin(cycle + Math.PI - 0.3)>0 ? -Math.sin(cycle + Math.PI - 0.3)*1.6 : Math.sin(cycle + Math.PI - 0.3)*0.2};
+        }
+        else if (runStyle === 'bound') {
+            // Predator bound (wolf, lion, tiger). High arching leaps.
+            // Both back legs together, both front legs together.
+            bounce = isMoving ? Math.sin(cycle) * 12 * s : 0;
+            pitch = isMoving ? Math.cos(cycle) * 0.3 : 0;
+
+            fb = {u: Math.sin(cycle - Math.PI/2)*0.8 - 0.1, l: Math.sin(cycle - Math.PI/2)>0 ? Math.sin(cycle - Math.PI/2)*1.4 : 0};
+            nb = {u: Math.sin(cycle - Math.PI/2)*0.8 - 0.1, l: Math.sin(cycle - Math.PI/2)>0 ? Math.sin(cycle - Math.PI/2)*1.4 : 0};
+            ff = {u: Math.sin(cycle + Math.PI/2)*0.8, l: Math.sin(cycle + Math.PI/2)>0 ? -Math.sin(cycle + Math.PI/2)*1.2 : Math.sin(cycle + Math.PI/2)*0.4};
+            nf = {u: Math.sin(cycle + Math.PI/2)*0.8, l: Math.sin(cycle + Math.PI/2)>0 ? -Math.sin(cycle + Math.PI/2)*1.2 : Math.sin(cycle + Math.PI/2)*0.4};
+        }
+        else if (runStyle === 'lumber') {
+            // Heavy, slow (elephant, bear, triceratops, bull). Alternating pacing.
+            bounce = isMoving ? Math.abs(Math.sin(cycle * 2)) * 3 * s : 0;
+            pitch = isMoving ? Math.sin(cycle * 2) * 0.05 : 0;
+
+            fb = {u: Math.sin(cycle + Math.PI)*0.5 - 0.1, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*0.8 : 0};
+            nb = {u: Math.sin(cycle)*0.5 - 0.1, l: Math.sin(cycle)>0 ? Math.sin(cycle)*0.8 : 0};
+            ff = {u: Math.sin(cycle)*0.5, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*0.8 : 0};
+            nf = {u: Math.sin(cycle + Math.PI)*0.5, l: Math.sin(cycle + Math.PI)>0 ? -Math.sin(cycle + Math.PI)*0.8 : 0};
+        }
+        else if (runStyle === 'waddle') {
+            // Short legs, fast scramble (pig, turtle, corgi, beaver).
+            bounce = isMoving ? Math.sin(cycle * 4) * 2 * s : 0;
+            pitch = 0;
+
+            fb = {u: Math.sin(cycle)*0.5, l: Math.sin(cycle)>0 ? Math.sin(cycle)*0.5 : 0};
+            nb = {u: Math.sin(cycle + Math.PI)*0.5, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*0.5 : 0};
+            ff = {u: Math.sin(cycle + Math.PI)*0.6, l: Math.sin(cycle + Math.PI)>0 ? -Math.sin(cycle + Math.PI)*0.5 : 0};
+            nf = {u: Math.sin(cycle)*0.6, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*0.5 : 0};
+        }
+
+        // Apply bounce and pitch to body center
+        let bodyY = pY - (35 * s) - Math.max(0, bounce);
         let chestX = pX + (15 * s);
         let chestY = bodyY - (5 * s) + (pitch * 20 * s);
         let rumpX  = pX - (20 * s);
@@ -1066,6 +1166,7 @@
             ctx.fillStyle = colorHoof;
             ctx.beginPath(); ctx.arc(hoofX, hoofY, width * 0.6, 0, Math.PI * 2); ctx.fill();
         }
+
 
         function drawIKLimb(startX, startY, endX, endY, len1, len2, width, color, invertKnee = false) {
             let dx = endX - startX;
@@ -1108,14 +1209,11 @@
             ctx.stroke();
         }
 
-        let fb = {u: Math.sin(cycle + Math.PI)*0.6 - 0.2, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*1.2 : 0};
-        let nb = {u: Math.sin(cycle + Math.PI + 0.5)*0.6 - 0.2, l: Math.sin(cycle + Math.PI + 0.5)>0 ? Math.sin(cycle + Math.PI + 0.5)*1.2 : 0};
-        let ff = {u: Math.sin(cycle)*0.7 + 0.1, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*1.6 : Math.sin(cycle)*0.2};
-        let nf = {u: Math.sin(cycle + 0.5)*0.7 + 0.1, l: Math.sin(cycle + 0.5)>0 ? -Math.sin(cycle + 0.5)*1.6 : Math.sin(cycle + 0.5)*0.2};
+        // Shadow based on body bounce
+        let shadowW = Math.max(20*s, (45 * s) - (bounce * 1.5));
 
-        // Shadow
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.beginPath(); ctx.ellipse(pX, pY, 45 * s, 8 * s, 0, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(pX, pY, shadowW, 8 * s, 0, 0, Math.PI*2); ctx.fill();
 
         let headX = 0, headY = 0;
 

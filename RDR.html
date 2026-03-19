@@ -41,7 +41,7 @@
             font-size: 14px;
             font-family: 'Courier New', Courier, monospace;
             color: #aaa;
-            z-index: 20;
+            z-index: 5; /* Keep below UI overlays */
             pointer-events: none;
             background: rgba(15, 12, 27, 0.8);
             padding: 5px 10px;
@@ -74,6 +74,7 @@
             box-sizing: border-box;
             z-index: 10;
             overflow-y: auto;
+            padding-bottom: 80px; /* Leave space for instructions text */
         }
         .hidden { display: none !important; }
         
@@ -171,6 +172,8 @@
             font-family: inherit; text-transform: uppercase; letter-spacing: 2px;
             box-shadow: 0 4px 0 #ef6c00; transition: transform 0.1s, box-shadow 0.1s;
             margin-top: 5px;
+            position: relative;
+            z-index: 25;
         }
         .action-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #ef6c00; }
         
@@ -232,8 +235,20 @@
                 </div>
             </div>
             
-            <button class="action-btn" onclick="startRace()">Enter Next Race</button>
+            <button class="action-btn" onclick="openTournamentsMenu()">Tournaments</button>
             <button class="action-btn" style="background: #4fc3f7; color: #01579b; border-bottom-color: #0277bd; margin-top: 10px;" onclick="openCustomRaceMenu()">Custom Race</button>
+        </div>
+
+        <!-- TOURNAMENT SELECTION OVERLAY -->
+        <div id="tournament-ui" class="overlay hidden">
+            <div class="menu-title">Tournaments</div>
+            <div class="stats-bar">Funds: $<span id="t-money-display">0</span> | Highest Unlocked: <span id="t-cup-display" style="color:#ffcc80;"></span></div>
+
+            <div id="tournament-list" style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px;">
+                <!-- Filled via JS -->
+            </div>
+
+            <button class="action-btn" style="background: #e57373; margin-top: 10px;" onclick="openShop()">Back</button>
         </div>
 
         <!-- CUSTOM RACE OVERLAY -->
@@ -293,9 +308,19 @@
     let gameState = 'SHOP'; 
     let money = 0;
     
-    // Upgrades System
-    let upgrades = { speed: 1, accel: 1, stamina: 1, assist: 1 };
-    function getUpgradeCost(type) { return upgrades[type] * 50; }
+    // Upgrades System (Independent per animal)
+    let animalUpgrades = {
+        human: { speed: 1, accel: 1, stamina: 1, assist: 1 }
+    };
+    function getUpgrades(animalKey) {
+        if (!animalUpgrades[animalKey]) {
+            animalUpgrades[animalKey] = { speed: 1, accel: 1, stamina: 1, assist: 1 };
+        }
+        return animalUpgrades[animalKey];
+    }
+    function getUpgradeCost(animalKey, type) {
+        return getUpgrades(animalKey)[type] * 50;
+    }
 
     // --- RIDER TYPES ---
     const RIDER_TYPES = {
@@ -346,9 +371,22 @@
                 { name: "Fearsome Tiger", anim: 'tiger', color: '#e57373', riderColor: '#000000', baseSpeed: 6500, perfChance: 0.6 } ] },
         { name: "The Grand Champion", prize: 1000, length: 150000,
           ai: [ { name: "King of Sprint", anim: 'lion', color: '#e5c158', riderColor: '#ffb300', baseSpeed: 8000, perfChance: 0.9 },
-                { name: "Star Weaver", anim: 'unicorn', color: '#f8bbd0', riderColor: '#1565c0', baseSpeed: 9500, perfChance: 0.85 } ] }
+                { name: "Star Weaver", anim: 'unicorn', color: '#f8bbd0', riderColor: '#1565c0', baseSpeed: 9500, perfChance: 0.85 } ] },
+        { name: "National Championship", prize: 10000, length: 200000,
+          ai: [ { name: "Shadow Runner", anim: 'wolf', color: '#212121', riderColor: '#ff5722', baseSpeed: 8500, perfChance: 0.95 },
+                { name: "Earth Shaker", anim: 'elephant', color: '#616161', riderColor: '#00bcd4', baseSpeed: 10000, perfChance: 0.9 } ] },
+        { name: "World Finals", prize: 50000, length: 250000,
+          ai: [ { name: "Apex Predator", anim: 'tiger', color: '#b71c1c', riderColor: '#ffeb3b', baseSpeed: 9500, perfChance: 0.98 },
+                { name: "Desert Storm", anim: 'camel', color: '#ffb300', riderColor: '#4caf50', baseSpeed: 11000, perfChance: 0.95 } ] },
+        { name: "Galactic Sprint", prize: 250000, length: 350000,
+          ai: [ { name: "Comet", anim: 'unicorn', color: '#ffffff', riderColor: '#e91e63', baseSpeed: 12000, perfChance: 0.99 },
+                { name: "Meteor", anim: 'triceratops', color: '#ff9800', riderColor: '#9c27b0', baseSpeed: 13000, perfChance: 0.98 } ] },
+        { name: "Mythic Drag", prize: 1000000, length: 500000,
+          ai: [ { name: "God of Speed", anim: 'unicorn', color: '#ffd700', riderColor: '#ffffff', baseSpeed: 15000, perfChance: 1.0 },
+                { name: "Titan", anim: 'bear', color: '#d50000', riderColor: '#000000', baseSpeed: 16000, perfChance: 0.99 } ] }
     ];
     let currentTourney = 0;
+    let activeTournamentIndex = 0;
 
     // --- RACE STATE VARIABLES ---
     const fps = 60;
@@ -382,13 +420,13 @@
         document.getElementById('money-display').innerText = money;
         document.getElementById('cup-display').innerText = tournaments[Math.min(currentTourney, tournaments.length-1)].name;
         
+        let upgrades = getUpgrades(selectedAnimal);
         ['speed', 'accel', 'stamina', 'assist'].forEach(type => {
             document.getElementById(`lvl-${type}`).innerText = upgrades[type];
             let btn = document.getElementById(`btn-${type}`);
-            let cost = getUpgradeCost(type);
+            let cost = getUpgradeCost(selectedAnimal, type);
             btn.innerText = `Buy: $${cost}`;
-            btn.disabled = (money < cost || upgrades[type] >= 10);
-            if (upgrades[type] >= 10) btn.innerText = "MAX";
+            btn.disabled = (money < cost); // No more level cap
         });
 
         renderMountSelector();
@@ -533,8 +571,9 @@
     }
 
     function buyUpgrade(type) {
-        let cost = getUpgradeCost(type);
-        if (money >= cost && upgrades[type] < 10) {
+        let cost = getUpgradeCost(selectedAnimal, type);
+        let upgrades = getUpgrades(selectedAnimal);
+        if (money >= cost) {
             money -= cost;
             upgrades[type]++;
             updateShopUI();
@@ -546,12 +585,59 @@
         document.getElementById('shop-ui').classList.remove('hidden');
         document.getElementById('results-ui').classList.add('hidden');
         document.getElementById('custom-race-ui').classList.add('hidden');
+        document.getElementById('tournament-ui').classList.add('hidden');
         updateShopUI();
     }
 
     function openCustomRaceMenu() {
         document.getElementById('shop-ui').classList.add('hidden');
         document.getElementById('custom-race-ui').classList.remove('hidden');
+    }
+
+    function openTournamentsMenu() {
+        document.getElementById('shop-ui').classList.add('hidden');
+        document.getElementById('tournament-ui').classList.remove('hidden');
+
+        document.getElementById('t-money-display').innerText = money;
+        document.getElementById('t-cup-display').innerText = tournaments[Math.min(currentTourney, tournaments.length-1)].name;
+
+        let listContainer = document.getElementById('tournament-list');
+        listContainer.innerHTML = '';
+
+        tournaments.forEach((t, i) => {
+            let item = document.createElement('div');
+            let isUnlocked = i <= currentTourney;
+
+            item.className = 'shop-item';
+            item.style.flexDirection = 'row';
+            item.style.alignItems = 'center';
+            item.style.padding = '15px';
+            if (!isUnlocked) item.style.opacity = '0.5';
+
+            let infoDiv = document.createElement('div');
+            infoDiv.style.textAlign = 'left';
+            infoDiv.innerHTML = `<h4 style="margin:0; font-size:16px;">${t.name}</h4><p style="margin:5px 0 0 0; color:#aed581;">Prize: $${t.prize} | Length: ${(t.length/1000).toFixed(0)}k</p>`;
+
+            let actionBtn = document.createElement('button');
+            if (isUnlocked) {
+                actionBtn.innerText = "ENTER";
+                actionBtn.onclick = () => startTournamentRace(i);
+                actionBtn.style.padding = '10px 20px';
+                actionBtn.style.fontSize = '14px';
+            } else {
+                actionBtn.innerText = "LOCKED";
+                actionBtn.disabled = true;
+            }
+
+            item.appendChild(infoDiv);
+            item.appendChild(actionBtn);
+            listContainer.appendChild(item);
+        });
+    }
+
+    function startTournamentRace(index) {
+        document.getElementById('tournament-ui').classList.add('hidden');
+        startRace(index);
     }
 
     function startCustomRace() {
@@ -563,14 +649,14 @@
         setupRace(true);
     }
 
-    function startRace() {
+    function startRace(tournamentIndex) {
         isCustomRace = false;
         document.getElementById('shop-ui').classList.add('hidden');
         
-        setupRace(false);
+        setupRace(false, tournamentIndex);
     }
 
-    function setupRace(isCustom) {
+    function setupRace(isCustom, tournamentIndex = -1) {
         gameState = 'RACE';
         
         let tourney;
@@ -590,8 +676,9 @@
                 ]
             };
         } else {
-            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            let tIndex = tournamentIndex !== -1 ? tournamentIndex : Math.min(currentTourney, tournaments.length - 1);
             tourney = tournaments[tIndex];
+            activeTournamentIndex = tIndex;
         }
 
         raceTimer = 0;
@@ -616,11 +703,12 @@
         // Combine Base Mount Stats + Upgrades + Rider Stats
         let anim = ANIMAL_TYPES[selectedAnimal];
         let riderInfo = RIDER_TYPES[selectedRider];
-        let playerMaxSpeed = anim.spd + (upgrades.speed * 800) + riderInfo.spdBonus;
-        let playerAccel = anim.acc + (upgrades.accel * 250) + riderInfo.accBonus;
-        let playerAssist = 1.0 + (upgrades.assist * 0.15); 
-        let pStamDrain = Math.max(0.5, anim.drain - (upgrades.stamina * 0.2) + riderInfo.drainBonus);
-        let pStamRegen = anim.reg + (upgrades.stamina * 0.1) + riderInfo.regBonus;
+        let pUpgrades = getUpgrades(selectedAnimal);
+        let playerMaxSpeed = anim.spd + (pUpgrades.speed * 800) + riderInfo.spdBonus;
+        let playerAccel = anim.acc + (pUpgrades.accel * 250) + riderInfo.accBonus;
+        let playerAssist = 1.0 + (pUpgrades.assist * 0.15);
+        let pStamDrain = Math.max(0.5, anim.drain - (pUpgrades.stamina * 0.2) + riderInfo.drainBonus);
+        let pStamRegen = anim.reg + (pUpgrades.stamina * 0.1) + riderInfo.regBonus;
 
         // Match opponent mounts to the player's current mount in tournaments
         // If it's a Custom Race, we keep the random anim types generated earlier.
@@ -629,8 +717,8 @@
 
         // Scale opponents dynamically to the player's total top speed.
         // For custom races, base it on difficulty.
-        // For tournaments, base it on the tournament tier (currentTourney) so early ones are easy.
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
+        // For tournaments, base it on the tournament tier so early ones are easy.
+        let tIndex = isCustom ? 0 : tournaments.indexOf(tourney);
         let tMultiplier1 = isCustom ? (0.95 + (0.10 * customDifficulty)) : (0.75 + (0.05 * tIndex));
         let tMultiplier2 = isCustom ? (0.85 + (0.10 * customDifficulty)) : (0.70 + (0.05 * tIndex));
 
@@ -710,8 +798,9 @@
         if (gameState !== 'RACE') return;
         
         let allFinished = true;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        // determine the current active tournament for length logic
+        let currentActiveTourney = tournaments[activeTournamentIndex];
+        let trackLength = isCustomRace ? customTrackLength : currentActiveTourney.length;
         
         let playerRacer = racers.find(r => r.isPlayer);
         let anyMoving = false;
@@ -876,12 +965,15 @@
             else if (playerPos === 2) prize = Math.floor(basePrize * customDifficulty * 0.5);
             else prize = Math.floor(basePrize * customDifficulty * 0.2);
         } else {
-            let tIndex = Math.min(currentTourney, tournaments.length - 1);
-            if (playerPos === 1) prize = tournaments[tIndex].prize;
-            else if (playerPos === 2) prize = Math.floor(tournaments[tIndex].prize * 0.3);
-            else prize = Math.floor(tournaments[tIndex].prize * 0.1);
+            let currentActiveTourney = tournaments[activeTournamentIndex];
 
-            if (playerPos === 1 && currentTourney < tournaments.length - 1) currentTourney++;
+            if (playerPos === 1) prize = currentActiveTourney.prize;
+            else if (playerPos === 2) prize = Math.floor(currentActiveTourney.prize * 0.3);
+            else prize = Math.floor(currentActiveTourney.prize * 0.1);
+
+            if (playerPos === 1 && activeTournamentIndex === currentTourney && currentTourney < tournaments.length - 1) {
+                currentTourney++;
+            }
         }
         
         document.getElementById('prize-display').innerText = prize;
@@ -898,8 +990,8 @@
         ctx.clearRect(0, 0, width, height);
         
         let playerDist = racers.find(r => r.isPlayer)?.dist || 0;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        let currentActiveTourney = tournaments[activeTournamentIndex];
+        let trackLength = isCustomRace ? customTrackLength : currentActiveTourney.length;
 
         drawEnvironment(playerDist);
         drawFinishLine(playerDist, trackLength);

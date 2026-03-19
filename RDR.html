@@ -646,33 +646,18 @@
         let ai2PerfChance = isCustom ? tourney.ai[1].perfChance : Math.min(0.85, 0.15 + (tIndex * 0.2));
 
         racers = [
-
             { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: ai1AnimType, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor, riderShape: 'normal',
-              y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, maxSpeed: ai1BaseSpeed,
+              y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: ai1BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: ai1PerfChance, finished: false, finishTime: 0 },
-
-            { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
-              y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, maxSpeed: playerMaxSpeed,
-              accel: playerAccel, assist: playerAssist, stamDrain: pStamDrain, stamRegen: pStamRegen,
-              phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
-
-            { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: ai2AnimType, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor, riderShape: 'normal',
-              y: height - 60, scale: ANIMAL_TYPES[ai2AnimType].scale * 1.3, dist: 0, speed: 0, maxSpeed: ai2BaseSpeed,
-              phase: Math.random(), stamina: 100, perfChance: ai2PerfChance, finished: false, finishTime: 0 }
-
-            { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: tourney.ai[0].anim, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor,
-              y: height - 140, scale: ANIMAL_TYPES[tourney.ai[0].anim].scale * 0.75, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: tourney.ai[0].baseSpeed,
-              phase: Math.random(), stamina: 100, perfChance: tourney.ai[0].perfChance, finished: false, finishTime: 0 },
             
-            { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: '#006064',
+            { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
               y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: playerMaxSpeed,
               accel: playerAccel, assist: playerAssist, stamDrain: pStamDrain, stamRegen: pStamRegen,
               phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
               
-            { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: tourney.ai[1].anim, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor,
-              y: height - 60, scale: ANIMAL_TYPES[tourney.ai[1].anim].scale * 1.3, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: tourney.ai[1].baseSpeed,
-              phase: Math.random(), stamina: 100, perfChance: tourney.ai[1].perfChance, finished: false, finishTime: 0 }
-
+            { id: 'ai2', isPlayer: false, name: tourney.ai[1].name, animType: ai2AnimType, color: tourney.ai[1].color, riderColor: tourney.ai[1].riderColor, riderShape: 'normal',
+              y: height - 60, scale: ANIMAL_TYPES[ai2AnimType].scale * 1.3, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: ai2BaseSpeed,
+              phase: Math.random(), stamina: 100, perfChance: ai2PerfChance, finished: false, finishTime: 0 }
         ];
     }
 
@@ -1012,16 +997,11 @@
         ctx.fillRect(0, height - 150, width, 150);
 
 
-        let numGround = Math.ceil(width / 150) + 2;
-        let groundOffset = (playerDist * 0.8) % 150;
-        ctx.fillStyle = 'rgba(0,0,0,0.4)';
-        for(let i = -1; i < numGround; i++) {
-            ctx.fillRect((i * 150) - groundOffset, height - 150, 40, 150);
-
         // Ground Details (grass/dirt lines)
+        let numGround = Math.ceil(width / 200) + 2;
         let groundOffset = (playerDist * 0.8) % 200;
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        for(let i = -1; i < 6; i++) {
+        for(let i = -1; i < numGround; i++) {
             let gx = (i * 200) - groundOffset;
             ctx.beginPath();
             ctx.moveTo(gx, height - 150);
@@ -1029,7 +1009,6 @@
             ctx.lineTo(gx + 100, height - 130);
             ctx.lineTo(gx + 150, height - 150);
             ctx.fill();
-
         }
     }
 
@@ -1229,13 +1208,6 @@
             ctx.lineTo(endX, endY);
             ctx.stroke();
         }
-
-        let fb = {u: Math.sin(cycle + Math.PI)*0.6 - 0.2, l: Math.sin(cycle + Math.PI)>0 ? Math.sin(cycle + Math.PI)*1.2 : 0};
-        let nb = {u: Math.sin(cycle + Math.PI + 0.5)*0.6 - 0.2, l: Math.sin(cycle + Math.PI + 0.5)>0 ? Math.sin(cycle + Math.PI + 0.5)*1.2 : 0};
-        let ff = {u: Math.sin(cycle)*0.7 + 0.1, l: Math.sin(cycle)>0 ? -Math.sin(cycle)*1.6 : Math.sin(cycle)*0.2};
-        let nf = {u: Math.sin(cycle + 0.5)*0.7 + 0.1, l: Math.sin(cycle + 0.5)>0 ? -Math.sin(cycle + 0.5)*1.6 : Math.sin(cycle + 0.5)*0.2};
-
-        // Shadow
 
         // Shadow based on body bounce
         let shadowW = Math.max(20*s, (45 * s) - (bounce * 1.5));

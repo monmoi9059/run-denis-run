@@ -301,7 +301,7 @@
                 <!-- Filled via JS -->
             </div>
             <div class="stats-bar">Prize Money: $<span id="prize-display">0</span></div>
-            <button class="action-btn" onclick="openShop()">Return to Stables</button>
+            <button id="results-return-btn" class="action-btn" onclick="handleRaceReturn()">Return to Stables</button>
         </div>
     </div>
 
@@ -1048,12 +1048,20 @@
         document.getElementById('prize-display').innerText = prize;
 
         let returnBtn = document.getElementById('results-return-btn');
+        if (returnBtn) {
+            if (isCareerRace) {
+                returnBtn.innerText = "Return to Career Locker Room";
+            } else {
+                returnBtn.innerText = "Return to Stables";
+            }
+        }
+    }
+
+    function handleRaceReturn() {
         if (isCareerRace) {
-            returnBtn.innerText = "Return to Career Locker Room";
-            returnBtn.onclick = openCareerMenu;
+            openCareerMenu();
         } else {
-            returnBtn.innerText = "Return to Stables";
-            returnBtn.onclick = openShop;
+            openShop();
         }
     }
 

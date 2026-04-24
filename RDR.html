@@ -853,8 +853,16 @@
         if (gameState !== 'RACE') return;
         
         let allFinished = true;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        let trackLength;
+        if (isCustomRace) {
+            trackLength = customTrackLength;
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            trackLength = careerTournaments[tIndex].length;
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            trackLength = tournaments[tIndex].length;
+        }
         
         let playerRacer = racers.find(r => r.isPlayer);
         let anyMoving = false;
@@ -1042,16 +1050,16 @@
         let returnBtn = document.getElementById('results-return-btn');
         if (isCareerRace) {
             returnBtn.innerText = "Return to Career Locker Room";
-            returnBtn.setAttribute('onclick', 'openCareerMenu()');
+            returnBtn.onclick = openCareerMenu;
         } else {
             returnBtn.innerText = "Return to Stables";
-            returnBtn.setAttribute('onclick', 'openShop()');
+            returnBtn.onclick = openShop;
         }
     }
 
     // --- RENDERING ---
     function render() {
-        if (gameState === 'SHOP') return; 
+        if (gameState === 'SHOP' || gameState === 'CAREER_MENU') return;
         
         ctx.save();
         ctx.translate(cameraShake.x, cameraShake.y);
@@ -1059,8 +1067,16 @@
         ctx.clearRect(0, 0, width, height);
         
         let playerDist = racers.find(r => r.isPlayer)?.dist || 0;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        let trackLength;
+        if (isCustomRace) {
+            trackLength = customTrackLength;
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            trackLength = careerTournaments[tIndex].length;
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            trackLength = tournaments[tIndex].length;
+        }
 
         drawEnvironment(playerDist);
         drawFinishLine(playerDist, trackLength);

@@ -204,11 +204,72 @@
         .result-1st { color: #ffeb3b; text-shadow: 2px 2px 0px #000, 0 0 10px #ffeb3b; border-color: #fbc02d;}
         .result-2nd { color: #e0e0e0; text-shadow: 2px 2px 0px #000; border-color: #9e9e9e;}
         .result-3rd { color: #ffab91; text-shadow: 2px 2px 0px #000; border-color: #d84315;}
+
+        /* Mobile Button */
+        #mobile-sprint-btn {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 112, 67, 0.7);
+            border: 4px solid rgba(191, 54, 12, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            user-select: none;
+            touch-action: none;
+            z-index: 30;
+            box-shadow: 0 4px 0 rgba(191, 54, 12, 0.7);
+            cursor: pointer;
+        }
+        #mobile-sprint-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(191, 54, 12, 0.7);
+            background: rgba(255, 138, 101, 0.8);
+        }
+        .customize-mode #mobile-sprint-btn {
+            border-style: dashed;
+            background: rgba(76, 175, 80, 0.7);
+            border-color: rgba(27, 94, 32, 0.7);
+            box-shadow: none;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            background: #8d6e63;
+            border: 4px solid #3e2723;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 0 #3e2723;
+        }
+        .settings-row label {
+            color: #fff;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 2px 2px 0px #3e2723;
+        }
+        .settings-row input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <div id="game-container">
+        <div id="mobile-sprint-btn" class="hidden">👣</div>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         
         <!-- SHOP OVERLAY -->
@@ -260,6 +321,29 @@
             <button class="action-btn" onclick="startRace()">Enter Next Race</button>
             <button class="action-btn" style="background: #4fc3f7; color: #01579b; border-bottom-color: #0277bd; margin-top: 10px;" onclick="openCustomRaceMenu()">Custom Race</button>
             <button class="action-btn" style="background: #e91e63; color: #fce4ec; border-bottom-color: #c2185b; margin-top: 10px;" onclick="openCareerMenu()">Go to Career Mode</button>
+            <button class="action-btn" style="background: #8d6e63; color: #fff; border-bottom-color: #4e342e; margin-top: 10px; padding: 10px 20px; font-size: 16px;" onclick="openSettingsMenu()">Settings ⚙️</button>
+        </div>
+
+        <!-- SETTINGS OVERLAY -->
+        <div id="settings-ui" class="overlay hidden">
+            <div class="menu-title">Settings</div>
+
+            <div class="settings-row">
+                <label for="mobile-toggle">Mobile Sprint Button</label>
+                <input type="checkbox" id="mobile-toggle" onchange="toggleMobileControls()">
+            </div>
+
+            <button id="customize-btn" class="action-btn hidden" style="background: #4fc3f7; color: #01579b; border-bottom-color: #0277bd; margin-bottom: 20px;" onclick="startCustomizing()">Customize Button Position</button>
+
+            <button class="action-btn" style="background: #e57373; margin-top: auto;" onclick="openShop()">Back to Menu</button>
+        </div>
+
+        <!-- CUSTOMIZE UI -->
+        <div id="customize-ui" class="overlay hidden" style="background: rgba(0,0,0,0.8); pointer-events: none; justify-content: center;">
+            <div style="background: rgba(20, 5, 36, 0.9); padding: 10px 20px; border-radius: 12px; border: 3px solid #140524; color: white; font-weight: bold; font-size: 20px; text-shadow: 2px 2px 0px #000; text-align: center; pointer-events: auto;">
+                Drag the button to position it.<br>
+                <button class="action-btn" style="font-size: 16px; padding: 10px 20px; margin-top: 15px;" onclick="finishCustomizing()">Done</button>
+            </div>
         </div>
 
         <!-- CAREER OVERLAY -->
@@ -356,6 +440,24 @@
     let money = 0;
     let careerMoney = 0;
     
+    // Settings State
+    let mobileControlsEnabled = false;
+    let mobileButtonPos = { x: width - 100, y: height - 100 };
+
+    // Load Settings
+    try {
+        let savedMobile = localStorage.getItem('rdr_mobileControls');
+        if (savedMobile !== null) mobileControlsEnabled = savedMobile === 'true';
+
+        let savedPos = localStorage.getItem('rdr_mobilePos');
+        if (savedPos !== null) {
+            let parsed = JSON.parse(savedPos);
+            // Ensure within bounds
+            mobileButtonPos.x = Math.max(0, Math.min(width - 80, parsed.x));
+            mobileButtonPos.y = Math.max(0, Math.min(height - 80, parsed.y));
+        }
+    } catch(e) {}
+
     // Upgrades System
     let upgrades = { speed: 1, accel: 1, stamina: 1, assist: 1 };
     function getUpgradeCost(type) { return upgrades[type] * 50; }
@@ -482,6 +584,89 @@
     });
     window.addEventListener('keyup', (e) => {
         if (e.code === 'Space') keys.Space = false;
+    });
+
+    // --- MOBILE BUTTON LOGIC ---
+    const mobileBtn = document.getElementById('mobile-sprint-btn');
+    let isDraggingMobileBtn = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    // Handle pressing the button during a race
+    function handleMobileBtnPress(e) {
+        if (gameState === 'RACE') {
+            e.preventDefault(); // Prevent double firing from touch/mouse
+            handlePlayerHit();
+        }
+    }
+
+    // Support both touch and mouse for the button
+    mobileBtn.addEventListener('mousedown', (e) => {
+        if (gameState === 'CUSTOMIZE_CONTROLS') {
+            isDraggingMobileBtn = true;
+            dragOffsetX = e.clientX - mobileBtn.getBoundingClientRect().left;
+            dragOffsetY = e.clientY - mobileBtn.getBoundingClientRect().top;
+        } else if (gameState === 'RACE') {
+            handleMobileBtnPress(e);
+        }
+    });
+    mobileBtn.addEventListener('touchstart', (e) => {
+        if (gameState === 'CUSTOMIZE_CONTROLS') {
+            isDraggingMobileBtn = true;
+            let touch = e.touches[0];
+            dragOffsetX = touch.clientX - mobileBtn.getBoundingClientRect().left;
+            dragOffsetY = touch.clientY - mobileBtn.getBoundingClientRect().top;
+            e.preventDefault(); // prevent scrolling
+        } else if (gameState === 'RACE') {
+            handleMobileBtnPress(e);
+        }
+    });
+
+    // Handle dragging the button globally on window
+    window.addEventListener('mousemove', (e) => {
+        if (isDraggingMobileBtn && gameState === 'CUSTOMIZE_CONTROLS') {
+            let newX = e.clientX - dragOffsetX;
+            let newY = e.clientY - dragOffsetY;
+
+            // Keep in bounds
+            newX = Math.max(0, Math.min(window.innerWidth - 80, newX));
+            newY = Math.max(0, Math.min(window.innerHeight - 80, newY));
+
+            mobileButtonPos.x = newX;
+            mobileButtonPos.y = newY;
+            mobileBtn.style.left = newX + 'px';
+            mobileBtn.style.top = newY + 'px';
+        }
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (isDraggingMobileBtn && gameState === 'CUSTOMIZE_CONTROLS') {
+            let touch = e.touches[0];
+            let newX = touch.clientX - dragOffsetX;
+            let newY = touch.clientY - dragOffsetY;
+
+            newX = Math.max(0, Math.min(window.innerWidth - 80, newX));
+            newY = Math.max(0, Math.min(window.innerHeight - 80, newY));
+
+            mobileButtonPos.x = newX;
+            mobileButtonPos.y = newY;
+            mobileBtn.style.left = newX + 'px';
+            mobileBtn.style.top = newY + 'px';
+            e.preventDefault(); // prevent scrolling while dragging
+        }
+    }, { passive: false });
+
+    // Handle drop
+    window.addEventListener('mouseup', () => {
+        if (isDraggingMobileBtn) {
+            isDraggingMobileBtn = false;
+            try { localStorage.setItem('rdr_mobilePos', JSON.stringify(mobileButtonPos)); } catch(e){}
+        }
+    });
+    window.addEventListener('touchend', () => {
+        if (isDraggingMobileBtn) {
+            isDraggingMobileBtn = false;
+            try { localStorage.setItem('rdr_mobilePos', JSON.stringify(mobileButtonPos)); } catch(e){}
+        }
     });
 
     // --- SHOP & UI LOGIC ---
@@ -677,7 +862,55 @@
         document.getElementById('career-ui').classList.add('hidden');
         document.getElementById('results-ui').classList.add('hidden');
         document.getElementById('custom-race-ui').classList.add('hidden');
+        document.getElementById('settings-ui').classList.add('hidden');
+        document.getElementById('mobile-sprint-btn').classList.add('hidden');
+        document.body.classList.remove('customize-mode');
         updateShopUI();
+    }
+
+    function openSettingsMenu() {
+        gameState = 'SETTINGS';
+        document.getElementById('shop-ui').classList.add('hidden');
+        document.getElementById('settings-ui').classList.remove('hidden');
+
+        document.getElementById('mobile-toggle').checked = mobileControlsEnabled;
+        if (mobileControlsEnabled) {
+            document.getElementById('customize-btn').classList.remove('hidden');
+        } else {
+            document.getElementById('customize-btn').classList.add('hidden');
+        }
+    }
+
+    function toggleMobileControls() {
+        mobileControlsEnabled = document.getElementById('mobile-toggle').checked;
+        try { localStorage.setItem('rdr_mobileControls', mobileControlsEnabled); } catch(e){}
+
+        if (mobileControlsEnabled) {
+            document.getElementById('customize-btn').classList.remove('hidden');
+        } else {
+            document.getElementById('customize-btn').classList.add('hidden');
+        }
+    }
+
+    function startCustomizing() {
+        gameState = 'CUSTOMIZE_CONTROLS';
+        document.getElementById('settings-ui').classList.add('hidden');
+        document.getElementById('customize-ui').classList.remove('hidden');
+
+        let btn = document.getElementById('mobile-sprint-btn');
+        btn.classList.remove('hidden');
+        document.body.classList.add('customize-mode');
+
+        // Ensure valid position before showing
+        mobileButtonPos.x = Math.max(0, Math.min(window.innerWidth - 80, mobileButtonPos.x));
+        mobileButtonPos.y = Math.max(0, Math.min(window.innerHeight - 80, mobileButtonPos.y));
+        btn.style.left = mobileButtonPos.x + 'px';
+        btn.style.top = mobileButtonPos.y + 'px';
+    }
+
+    function finishCustomizing() {
+        document.getElementById('customize-ui').classList.add('hidden');
+        openSettingsMenu();
     }
 
     function openCareerMenu() {
@@ -722,6 +955,18 @@
     function setupRace(isCustom) {
         gameState = 'RACE';
         
+        let btn = document.getElementById('mobile-sprint-btn');
+        if (mobileControlsEnabled) {
+            btn.classList.remove('hidden');
+            // Ensure valid position
+            mobileButtonPos.x = Math.max(0, Math.min(window.innerWidth - 80, mobileButtonPos.x));
+            mobileButtonPos.y = Math.max(0, Math.min(window.innerHeight - 80, mobileButtonPos.y));
+            btn.style.left = mobileButtonPos.x + 'px';
+            btn.style.top = mobileButtonPos.y + 'px';
+        } else {
+            btn.classList.add('hidden');
+        }
+
         let tourney;
         if (isCustom) {
             let names = ["Speedy Pete", "Fast John", "Wild Bill", "Coyote", "Dusty", "Bullet"];
@@ -1032,6 +1277,7 @@
     function showResults() {
         gameState = 'RESULTS';
         document.getElementById('results-ui').classList.remove('hidden');
+        document.getElementById('mobile-sprint-btn').classList.add('hidden');
         leaderboardResults.sort((a, b) => a.finishTime - b.finishTime);
         
         let listHtml = '';
@@ -1092,7 +1338,7 @@
 
     // --- RENDERING ---
     function render() {
-        if (gameState === 'SHOP' || gameState === 'CAREER_MENU') return;
+        if (gameState === 'SHOP' || gameState === 'CAREER_MENU' || gameState === 'SETTINGS') return;
         
         ctx.save();
         ctx.translate(cameraShake.x, cameraShake.y);

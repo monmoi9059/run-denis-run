@@ -10,7 +10,7 @@
             padding: 0;
             background-color: #0f0c1b;
             color: #f4e8d1;
-            font-family: 'Georgia', serif;
+            font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -38,14 +38,17 @@
             transform: translateX(-50%);
             text-align: center;
             max-width: 90vw;
-            font-size: 14px;
-            font-family: 'Courier New', Courier, monospace;
-            color: #aaa;
+            font-size: 16px;
+            font-family: inherit;
+            color: #fff;
+            text-shadow: 1px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
             z-index: 20;
             pointer-events: none;
-            background: rgba(15, 12, 27, 0.8);
-            padding: 5px 10px;
-            border-radius: 8px;
+            background: rgba(43, 15, 76, 0.9);
+            border: 3px solid #140524;
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 0 #140524;
             display: none;
         }
         @media (min-width: 768px) {
@@ -54,18 +57,20 @@
             }
         }
         .key {
-            background: #f4e8d1;
+            background: #ffcc00;
             color: #000;
-            padding: 2px 6px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 6px;
             font-weight: bold;
+            border: 2px solid #000;
+            box-shadow: 0 2px 0 #000;
         }
         
         /* UI OVERLAYS */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 12, 27, 0.95);
+            background: rgba(20, 5, 36, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,20 +83,20 @@
         .hidden { display: none !important; }
         
         .menu-title { 
-            font-size: 32px; 
+            font-size: 38px;
             color: #ffb74d; 
             margin-bottom: 5px; 
-            text-shadow: 2px 2px 0px #4e342e; 
+            text-shadow: 3px 3px 0px #4e342e, -1px -1px 0 #4e342e, 1px -1px 0 #4e342e, -1px 1px 0 #4e342e, 1px 1px 0 #4e342e;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        .stats-bar { font-size: 16px; margin-bottom: 15px; color: #aed581; font-family: 'Courier New', monospace;}
+        .stats-bar { font-size: 18px; margin-bottom: 15px; color: #aed581; font-family: inherit; font-weight: bold; text-shadow: 1px 1px 0px #000; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 2px solid #2a1040;}
         
         .shop-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 15px;
             width: 100%;
             max-width: 700px;
@@ -110,75 +115,87 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: linear-gradient(145deg, #3e2723, #211512);
-            border: 2px solid #5d4037;
-            padding: 10px;
-            border-radius: 8px;
+            background: #8d6e63;
+            border: 4px solid #3e2723;
+            padding: 15px;
+            border-radius: 16px;
             flex: 1;
             min-width: 250px;
+            box-shadow: 0 6px 0 #3e2723;
         }
         .selector-container label {
-            color: #ffcc80;
-            margin-bottom: 5px;
+            color: #fff;
+            margin-bottom: 8px;
             font-weight: bold;
             letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #3e2723;
+            font-size: 20px;
         }
         .selector-container select {
             width: 100%;
-            padding: 8px;
-            background: #211512;
-            color: #f4e8d1;
-            border: 1px solid #795548;
-            border-radius: 4px;
+            padding: 10px;
+            background: #fff;
+            color: #3e2723;
+            border: 3px solid #3e2723;
+            border-radius: 8px;
             font-family: inherit;
             font-size: 16px;
+            font-weight: bold;
+            outline: none;
         }
         .selector-desc {
             margin-top: 10px;
-            font-size: 12px;
-            color: #bcaaa4;
+            font-size: 14px;
+            color: #fff;
+            text-shadow: 1px 1px 0px #3e2723;
             text-align: center;
             min-height: 40px;
+            font-weight: bold;
         }
         .selector-action {
-            margin-top: 5px;
+            margin-top: 10px;
+            width: 100%;
         }
         .shop-item {
-            background: linear-gradient(145deg, #3e2723, #211512);
-            border: 2px solid #5d4037;
-            padding: 10px;
-            border-radius: 8px;
+            background: #4fc3f7;
+            border: 4px solid #01579b;
+            padding: 15px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 0 #01579b;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
-        .shop-item h4 { margin: 0 0 5px 0; color: #ffcc80; text-transform: uppercase; letter-spacing: 1px; font-size: 14px;}
-        .shop-item p { margin: 0 0 5px 0; font-size: 11px; color: #bcaaa4; font-family: 'Courier New', monospace;}
+        .shop-item h4 { margin: 0 0 8px 0; color: #fff; text-transform: uppercase; letter-spacing: 1px; font-size: 18px; text-shadow: 2px 2px 0px #01579b;}
+        .shop-item p { margin: 0 0 10px 0; font-size: 13px; color: #fff; font-family: inherit; font-weight: bold; text-shadow: 1px 1px 0px #01579b;}
         .shop-item button {
-            background: #ff7043; color: #fff; border: 2px solid #d84315; padding: 6px 12px; 
-            cursor: pointer; font-weight: bold; border-radius: 4px;
-            font-family: inherit; transition: all 0.2s; font-size: 12px;
-            margin-top: 5px;
+            background: #ffca28; color: #3e2723; border: 3px solid #3e2723; padding: 8px 12px;
+            cursor: pointer; font-weight: bold; border-radius: 8px;
+            font-family: inherit; transition: all 0.1s; font-size: 16px;
+            margin-top: auto;
+            box-shadow: 0 4px 0 #3e2723;
         }
-        .shop-item button:hover:not(:disabled) { background: #f4511e; transform: scale(1.05); }
-        .shop-item button:disabled { background: #3e2723; border-color: #211512; color: #795548; cursor: not-allowed; }
+        .shop-item button:hover:not(:disabled) { background: #ffe082; transform: translateY(-2px); box-shadow: 0 6px 0 #3e2723; }
+        .shop-item button:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #3e2723; }
+        .shop-item button:disabled { background: #b0bec5; border-color: #455a64; color: #455a64; cursor: not-allowed; box-shadow: 0 4px 0 #455a64;}
         
         .action-btn {
-            background: #ffb74d; color: #3e2723; border: none; padding: 12px 35px;
-            font-size: 18px; cursor: pointer; font-weight: bold; border-radius: 4px;
+            background: #ff7043; color: #fff; border: 4px solid #bf360c; padding: 15px 40px;
+            font-size: 22px; cursor: pointer; font-weight: bold; border-radius: 16px;
             font-family: inherit; text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 4px 0 #ef6c00; transition: transform 0.1s, box-shadow 0.1s;
-            margin-top: 5px;
+            box-shadow: 0 8px 0 #bf360c; transition: transform 0.1s, box-shadow 0.1s;
+            margin-top: 10px;
+            text-shadow: 2px 2px 0px #bf360c;
         }
-        .action-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #ef6c00; }
+        .action-btn:hover { background: #ff8a65; transform: translateY(-2px); box-shadow: 0 10px 0 #bf360c;}
+        .action-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #bf360c; }
         
         /* Race Results */
-        .result-row { display: flex; justify-content: space-between; width: 400px; margin: 8px 0; font-size: 22px; }
-        .result-1st { color: #ffd700; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5);}
-        .result-2nd { color: #e0e0e0; }
-        .result-3rd { color: #cd7f32; }
+        .result-row { display: flex; justify-content: space-between; width: 400px; margin: 10px 0; font-size: 24px; font-weight: bold; padding: 10px; border-radius: 8px; border: 3px solid #000; background: rgba(0,0,0,0.5);}
+        .result-1st { color: #ffeb3b; text-shadow: 2px 2px 0px #000, 0 0 10px #ffeb3b; border-color: #fbc02d;}
+        .result-2nd { color: #e0e0e0; text-shadow: 2px 2px 0px #000; border-color: #9e9e9e;}
+        .result-3rd { color: #ffab91; text-shadow: 2px 2px 0px #000; border-color: #d84315;}
     </style>
 </head>
 <body>
@@ -1104,108 +1121,165 @@
 
     function drawEnvironment(playerDist) {
         let skyGradient = ctx.createLinearGradient(0, 0, 0, height - 100);
-        skyGradient.addColorStop(0, '#0f0c29'); // Deep space
-        skyGradient.addColorStop(0.3, '#302b63'); // Dark purple
-        skyGradient.addColorStop(0.6, '#801a3c'); // Red sunset
-        skyGradient.addColorStop(1, '#ffb74d'); // Orange horizon
+        skyGradient.addColorStop(0, '#1a237e'); // Deep blue
+        skyGradient.addColorStop(0.3, '#3f51b5'); // Bright blue
+        skyGradient.addColorStop(0.7, '#ff8a65'); // Warm orange
+        skyGradient.addColorStop(1, '#ffd54f'); // Bright yellow
         ctx.fillStyle = skyGradient;
         ctx.fillRect(0, 0, width, height - 100);
 
-        // Draw stars
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        for(let i=0; i<40; i++) {
-            let starX = (i * 87 + playerDist * 0.005) % width;
-            let starY = (i * 37) % (height - 200);
-            ctx.fillRect(starX, starY, 2, 2);
+        // Draw stylized stars (little pluses)
+        ctx.fillStyle = '#ffffff';
+        for(let i=0; i<20; i++) {
+            let starX = (i * 123 + playerDist * 0.005) % width;
+            let starY = (i * 53) % (height - 250);
+            ctx.fillRect(starX, starY - 3, 2, 8);
+            ctx.fillRect(starX - 3, starY, 8, 2);
         }
 
-        // Draw Sun/Moon
-        ctx.fillStyle = '#ffecb3';
-        ctx.shadowColor = '#ffb74d';
-        ctx.shadowBlur = 50;
+        // Draw stylized Sun/Moon (crisp circles with outlines)
+        let sunX = width/2 + (playerDist * -0.01) % 100;
+        ctx.fillStyle = '#ffee58';
+        ctx.strokeStyle = '#f57f17';
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        let sunX = width/2 + (playerDist * -0.01) % 100; // slight move
-        ctx.arc(sunX, height - 150, 60, 0, Math.PI*2);
+        ctx.arc(sunX, height - 200, 60, 0, Math.PI*2);
         ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.stroke();
 
+        // Sun rays (cartoon style)
+        for(let i=0; i<8; i++) {
+            let angle = (i / 8) * Math.PI * 2 + (raceTimer * 0.2);
+            let rx = sunX + Math.cos(angle) * 80;
+            let ry = height - 200 + Math.sin(angle) * 80;
+            ctx.beginPath();
+            ctx.arc(rx, ry, 10, 0, Math.PI*2);
+            ctx.fill();
+        }
 
-        // Distant Mountains
+        // Fluffy Clouds
+        let numClouds = Math.ceil(width / 400) + 1;
+        let cloudOffset = (playerDist * 0.01) % 400;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        for (let i = -1; i < numClouds; i++) {
+            let cx = (i * 400) - cloudOffset + 150;
+            let cy = height - 300 + (i % 2 * 50);
+            ctx.beginPath();
+            ctx.arc(cx, cy, 30, 0, Math.PI*2);
+            ctx.arc(cx + 25, cy - 15, 40, 0, Math.PI*2);
+            ctx.arc(cx + 60, cy - 10, 35, 0, Math.PI*2);
+            ctx.arc(cx + 70, cy + 10, 25, 0, Math.PI*2);
+            ctx.arc(cx + 35, cy + 15, 30, 0, Math.PI*2);
+            ctx.fill();
+        }
+
+        // Distant Mountains (Rounded Hills)
         let numDistMtns = Math.ceil(width / 300) + 2;
-        let distMtnOffset = (playerDist * 0.015) % 800;
-        ctx.fillStyle = '#2a1a2e';
+        let distMtnOffset = (playerDist * 0.015) % 300;
+        ctx.fillStyle = '#673ab7';
+        ctx.strokeStyle = '#311b92';
+        ctx.lineWidth = 4;
         for(let i = -1; i < numDistMtns; i++) {
             let x = (i * 300) - distMtnOffset;
             ctx.beginPath();
-            ctx.moveTo(x - 100, height - 100);
-            ctx.lineTo(x + 100, height - 250);
-            ctx.lineTo(x + 150, height - 240);
-            ctx.lineTo(x + 300, height - 100);
+            ctx.moveTo(x - 50, height - 100);
+            ctx.quadraticCurveTo(x + 150, height - 250, x + 350, height - 100);
             ctx.fill();
+            ctx.stroke();
         }
 
-        // Mid Mountains
+        // Mid Mountains (Closer rounded hills)
         let numMtns = Math.ceil(width / 400) + 2;
-        let mtnOffset = (playerDist * 0.04) % 800;
-        ctx.fillStyle = '#1e0f1e';
+        let mtnOffset = (playerDist * 0.04) % 400;
+        ctx.fillStyle = '#9c27b0';
+        ctx.strokeStyle = '#4a148c';
+        ctx.lineWidth = 5;
         for(let i = -1; i < numMtns; i++) {
             let x = (i * 400) - mtnOffset;
             ctx.beginPath();
-            ctx.moveTo(x - 50, height - 100);
-            ctx.lineTo(x + 150, height - 300);
-            ctx.lineTo(x + 200, height - 280);
-            ctx.lineTo(x + 350, height - 100);
+            ctx.moveTo(x - 100, height - 100);
+            ctx.quadraticCurveTo(x + 200, height - 300, x + 500, height - 100);
             ctx.fill();
+            ctx.stroke();
         }
 
-        // Trees
+        // Trees (Stylized lollipops/pines)
         let numTrees = Math.ceil(width / 200) + 2;
-        let treeOffset = (playerDist * 0.15) % 400;
-        ctx.fillStyle = '#100510';
+        let treeOffset = (playerDist * 0.15) % 200;
         for(let i = -1; i < numTrees; i++) {
             let x = (i * 200) - treeOffset;
+            // Trunk
+            ctx.fillStyle = '#5d4037';
+            ctx.strokeStyle = '#3e2723';
+            ctx.lineWidth = 3;
+            ctx.fillRect(x + 70, height - 130, 20, 30);
+            ctx.strokeRect(x + 70, height - 130, 20, 30);
+
+            // Leaves
+            ctx.fillStyle = '#2e7d32';
+            ctx.strokeStyle = '#1b5e20';
             ctx.beginPath();
-            ctx.moveTo(x + 20, height - 100);
-            ctx.lineTo(x + 60, height - 220); // taller, thinner pines
-            ctx.lineTo(x + 100, height - 200);
-            ctx.lineTo(x + 130, height - 250);
-            ctx.lineTo(x + 160, height - 100);
+            ctx.arc(x + 80, height - 150, 40, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Leaf highlights
+            ctx.fillStyle = '#4caf50';
+            ctx.beginPath();
+            ctx.arc(x + 70, height - 160, 15, 0, Math.PI*2);
             ctx.fill();
         }
 
-        // Detailed Ground Gradient
+        // Vibrant Ground Gradient
         let groundGrad = ctx.createLinearGradient(0, height - 150, 0, height);
-        groundGrad.addColorStop(0, '#3e2215');
-        groundGrad.addColorStop(0.3, '#2a160d');
-        groundGrad.addColorStop(1, '#0c0502');
+        groundGrad.addColorStop(0, '#8d6e63'); // Dirt edge
+        groundGrad.addColorStop(0.1, '#795548');
+        groundGrad.addColorStop(1, '#3e2723');
         ctx.fillStyle = groundGrad; 
-        ctx.fillRect(0, height - 150, width, 150);
+        ctx.fillRect(0, height - 100, width, 100);
 
+        // Track line
+        ctx.strokeStyle = '#4e342e';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(0, height - 100);
+        ctx.lineTo(width, height - 100);
+        ctx.stroke();
 
-        // Ground Details (grass/dirt lines)
-        let numGround = Math.ceil(width / 200) + 2;
-        let groundOffset = (playerDist * 0.8) % 200;
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        // Ground Details (Stylized rocks/bumps)
+        let numGround = Math.ceil(width / 150) + 2;
+        let groundOffset = (playerDist * 0.8) % 150;
+        ctx.fillStyle = '#5d4037';
         for(let i = -1; i < numGround; i++) {
-            let gx = (i * 200) - groundOffset;
+            let gx = (i * 150) - groundOffset;
             ctx.beginPath();
-            ctx.moveTo(gx, height - 150);
-            ctx.lineTo(gx + 30, height - 130);
-            ctx.lineTo(gx + 100, height - 130);
-            ctx.lineTo(gx + 150, height - 150);
+            ctx.ellipse(gx + 50, height - 50, 20, 8, 0, 0, Math.PI*2);
             ctx.fill();
+            ctx.fillStyle = '#795548';
+            ctx.beginPath();
+            ctx.ellipse(gx + 48, height - 52, 12, 4, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = '#5d4037'; // reset for next iteration
         }
     }
 
     function drawForegroundParallax(playerDist) {
-        let numFg = Math.ceil(width / 400) + 2;
-        let fgOffset = (playerDist * 2.5) % 400;
-        ctx.fillStyle = '#0a0505'; 
+        let numFg = Math.ceil(width / 300) + 2;
+        let fgOffset = (playerDist * 2.5) % 300;
+        ctx.fillStyle = '#1a0d0a'; // Very dark brown/black
         for(let i = -1; i < numFg; i++) {
-            let x = (i * 400) - fgOffset;
-            ctx.fillRect(x, height - 80, 20, 80);
-            ctx.fillRect(x - 400, height - 60, 420, 10);
-            ctx.fillRect(x - 400, height - 30, 420, 10);
+            let x = (i * 300) - fgOffset;
+            // Cartoonish foreground mounds
+            ctx.beginPath();
+            ctx.arc(x, height, 80, Math.PI, 0);
+            ctx.fill();
+            // Foreground plants
+            ctx.beginPath();
+            ctx.ellipse(x + 100, height, 20, 40, Math.PI/4, 0, Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(x - 50, height, 15, 60, -Math.PI/6, 0, Math.PI);
+            ctx.fill();
         }
     }
 
@@ -1216,7 +1290,9 @@
         ctx.fillStyle = `rgba(255, 255, 255, ${opacityMult})`;
         
         speedLines.forEach(sl => {
-            ctx.fillRect(sl.x, sl.y, sl.length, 2);
+            ctx.beginPath();
+            ctx.roundRect(sl.x, sl.y, sl.length, 4, 2);
+            ctx.fill();
         });
     }
 
@@ -1225,31 +1301,46 @@
         let screenX = (remainingDist * 0.05) + 150; 
 
         if (screenX > -100 && screenX < width + 100) {
-            for(let y = 0; y < 150; y += 20) {
-                ctx.fillStyle = (y / 20) % 2 === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)';
-                ctx.fillRect(screenX, height - 150 + y, 20, 20);
-                ctx.fillStyle = (y / 20) % 2 === 0 ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.8)';
-                ctx.fillRect(screenX + 20, height - 150 + y, 20, 20);
+            for(let y = 0; y < 100; y += 20) {
+                ctx.fillStyle = (y / 20) % 2 === 0 ? 'white' : '#1a1a1a';
+                ctx.fillRect(screenX, height - 100 + y, 20, 20);
+                ctx.fillStyle = (y / 20) % 2 === 0 ? '#1a1a1a' : 'white';
+                ctx.fillRect(screenX + 20, height - 100 + y, 20, 20);
             }
+
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(screenX, height - 100, 40, 100);
+
+            // Pole
             ctx.fillStyle = '#b71c1c';
-            ctx.fillRect(screenX + 15, height - 350, 10, 200);
+            ctx.fillRect(screenX + 10, height - 350, 20, 250);
+            ctx.strokeRect(screenX + 10, height - 350, 20, 250);
+
+            // Banner
+            ctx.fillStyle = '#ffeb3b';
+            ctx.beginPath(); ctx.roundRect(screenX + 20, height - 350, 160, 50, 8); ctx.fill(); ctx.stroke();
             
             ctx.fillStyle = '#d32f2f';
-            ctx.fillRect(screenX + 15, height - 350, 150, 40);
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 20px Georgia';
-            ctx.fillText("FINISH", screenX + 30, height - 325);
+            ctx.font = "bold 26px 'Comic Sans MS', sans-serif";
+            ctx.fillText("FINISH!", screenX + 35, height - 315);
         }
     }
 
     function drawDust() {
         for (let p of dustParticles) {
-            let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-            grad.addColorStop(0, `rgba(180, 150, 120, ${p.life * 0.6})`);
-            grad.addColorStop(1, `rgba(180, 150, 120, 0)`);
-            ctx.fillStyle = grad;
+            ctx.fillStyle = `rgba(141, 110, 99, ${p.life})`;
+            ctx.strokeStyle = `rgba(62, 39, 35, ${p.life})`;
+            ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Cartoon highlight on dust
+            ctx.fillStyle = `rgba(215, 204, 200, ${p.life * 0.5})`;
+            ctx.beginPath();
+            ctx.arc(p.x - (p.size*0.3), p.y - (p.size*0.3), p.size*0.3, 0, Math.PI * 2);
             ctx.fill();
         }
     }
@@ -1297,19 +1388,27 @@
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.beginPath(); ctx.ellipse(pX, pY, 40 * s, 8 * s, 0, 0, Math.PI*2); ctx.fill();
 
+            ctx.lineWidth = 4 * s;
+            ctx.strokeStyle = '#000';
+
             if (runStyle === 'vehicle_slow' || runStyle === 'vehicle_bike' || runStyle === 'vehicle_car') {
                 // Wheels
                 let wRot = isMoving ? diff * 0.1 : 0;
                 ctx.fillStyle = '#111';
                 // Back Wheel
-                ctx.beginPath(); ctx.arc(drawX - 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(drawX - 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
                 // Front Wheel
-                ctx.beginPath(); ctx.arc(drawX + 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(drawX + 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
                 // Hubcaps
                 ctx.fillStyle = '#ccc';
-                ctx.beginPath(); ctx.arc(drawX - 20*s + Math.cos(wRot)*3*s, pY - 10*s + Math.sin(wRot)*3*s, 3*s, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(drawX + 20*s + Math.cos(wRot)*3*s, pY - 10*s + Math.sin(wRot)*3*s, 3*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(drawX - 20*s, pY - 10*s, 4*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(drawX + 20*s, pY - 10*s, 4*s, 0, Math.PI*2); ctx.fill();
+                // Wheel motion lines
+                if (isMoving) {
+                    ctx.beginPath(); ctx.moveTo(drawX - 20*s, pY - 10*s); ctx.lineTo(drawX - 20*s + Math.cos(wRot)*8*s, pY - 10*s + Math.sin(wRot)*8*s); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(drawX + 20*s, pY - 10*s); ctx.lineTo(drawX + 20*s + Math.cos(wRot)*8*s, pY - 10*s + Math.sin(wRot)*8*s); ctx.stroke();
+                }
 
                 // Body
                 ctx.fillStyle = racer.color;
@@ -1317,11 +1416,11 @@
                     ctx.beginPath();
                     ctx.moveTo(drawX - 35*s, pY - 10*s);
                     ctx.lineTo(drawX - 35*s, drawY - 10*s);
-                    ctx.lineTo(drawX - 10*s, drawY - 25*s);
-                    ctx.lineTo(drawX + 15*s, drawY - 25*s);
-                    ctx.lineTo(drawX + 35*s, drawY - 5*s);
-                    ctx.lineTo(drawX + 35*s, pY - 10*s);
-                    ctx.fill();
+                    ctx.quadraticCurveTo(drawX - 10*s, drawY - 35*s, drawX + 15*s, drawY - 25*s);
+                    ctx.quadraticCurveTo(drawX + 35*s, drawY - 15*s, drawX + 35*s, pY - 10*s);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+
                     // Window
                     ctx.fillStyle = '#81d4fa';
                     ctx.beginPath();
@@ -1329,13 +1428,14 @@
                     ctx.lineTo(drawX - 5*s, drawY - 20*s);
                     ctx.lineTo(drawX + 10*s, drawY - 20*s);
                     ctx.lineTo(drawX + 20*s, drawY - 10*s);
-                    ctx.fill();
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
                 } else if (runStyle === 'vehicle_bike') {
-                    ctx.fillRect(drawX - 25*s, drawY, 50*s, 15*s);
+                    ctx.beginPath(); ctx.roundRect(drawX - 25*s, drawY - 5*s, 50*s, 20*s, 10*s); ctx.fill(); ctx.stroke();
                     ctx.fillStyle = '#eee';
-                    ctx.fillRect(drawX + 10*s, drawY - 15*s, 5*s, 20*s);
+                    ctx.beginPath(); ctx.roundRect(drawX + 10*s, drawY - 20*s, 5*s, 20*s, 2*s); ctx.fill(); ctx.stroke();
                     ctx.fillStyle = '#111';
-                    ctx.fillRect(drawX + 5*s, drawY - 15*s, 15*s, 5*s);
+                    ctx.beginPath(); ctx.roundRect(drawX + 5*s, drawY - 20*s, 15*s, 5*s, 2*s); ctx.fill(); ctx.stroke();
                 } else if (runStyle === 'vehicle_slow') {
                     // Walker/Wheelchair
                     ctx.strokeStyle = '#eee';
@@ -1358,63 +1458,66 @@
 
                 if (runStyle === 'aircraft_heli') {
                     // Body
-                    ctx.beginPath(); ctx.ellipse(drawX, drawY, 30*s, 15*s, 0, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(drawX, drawY, 30*s, 20*s, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
                     // Tail
-                    ctx.fillRect(drawX - 50*s, drawY - 5*s, 30*s, 8*s);
+                    ctx.fillRect(drawX - 50*s, drawY - 5*s, 30*s, 10*s);
+                    ctx.strokeRect(drawX - 50*s, drawY - 5*s, 30*s, 10*s);
                     // Rotor blades
                     ctx.fillStyle = '#aaa';
                     let rot = (diff * 2) % (Math.PI * 2);
                     let bladeL = Math.cos(rot) * 40 * s;
-                    ctx.fillRect(drawX - bladeL, drawY - 20*s, bladeL * 2, 2*s);
-                    ctx.fillRect(drawX - 4*s, drawY - 20*s, 8*s, 5*s);
+                    ctx.fillRect(drawX - bladeL, drawY - 25*s, bladeL * 2, 4*s);
+                    ctx.fillRect(drawX - 4*s, drawY - 25*s, 8*s, 8*s);
                 } else if (runStyle === 'aircraft_jet') {
                     // Body
                     ctx.beginPath();
                     ctx.moveTo(drawX - 40*s, drawY);
                     ctx.lineTo(drawX + 40*s, drawY);
-                    ctx.lineTo(drawX + 20*s, drawY - 10*s);
-                    ctx.lineTo(drawX - 40*s, drawY - 10*s);
-                    ctx.fill();
+                    ctx.quadraticCurveTo(drawX + 50*s, drawY - 10*s, drawX + 20*s, drawY - 15*s);
+                    ctx.lineTo(drawX - 40*s, drawY - 15*s);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
                     // Wing
                     ctx.fillStyle = darkenColor(racer.color, 40);
                     ctx.beginPath();
                     ctx.moveTo(drawX - 10*s, drawY - 5*s);
-                    ctx.lineTo(drawX - 30*s, drawY - 25*s);
+                    ctx.lineTo(drawX - 30*s, drawY - 30*s);
                     ctx.lineTo(drawX + 10*s, drawY - 5*s);
-                    ctx.fill();
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
                     // Thrust
                     if (isMoving) {
                         ctx.fillStyle = '#ff5722';
-                        ctx.beginPath(); ctx.arc(drawX - 45*s - (Math.random()*10*s), drawY - 5*s, 5*s, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.arc(drawX - 45*s - (Math.random()*10*s), drawY - 8*s, 6*s, 0, Math.PI*2); ctx.fill();
                     }
                 } else if (runStyle === 'aircraft_rocket') {
                     // Body
                     ctx.beginPath();
-                    ctx.moveTo(drawX - 30*s, drawY + 10*s);
-                    ctx.lineTo(drawX + 30*s, drawY + 10*s);
-                    ctx.lineTo(drawX + 50*s, drawY);
-                    ctx.lineTo(drawX + 30*s, drawY - 10*s);
-                    ctx.lineTo(drawX - 30*s, drawY - 10*s);
-                    ctx.fill();
+                    ctx.moveTo(drawX - 30*s, drawY + 15*s);
+                    ctx.lineTo(drawX + 30*s, drawY + 15*s);
+                    ctx.quadraticCurveTo(drawX + 60*s, drawY, drawX + 30*s, drawY - 15*s);
+                    ctx.lineTo(drawX - 30*s, drawY - 15*s);
+                    ctx.closePath();
+                    ctx.fill(); ctx.stroke();
                     // Fins
                     ctx.fillStyle = '#f44336';
-                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 10*s); ctx.lineTo(drawX - 40*s, drawY - 30*s); ctx.lineTo(drawX - 10*s, drawY - 10*s); ctx.fill();
-                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY + 10*s); ctx.lineTo(drawX - 40*s, drawY + 30*s); ctx.lineTo(drawX - 10*s, drawY + 10*s); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 15*s); ctx.lineTo(drawX - 40*s, drawY - 35*s); ctx.lineTo(drawX - 10*s, drawY - 15*s); ctx.fill(); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY + 15*s); ctx.lineTo(drawX - 40*s, drawY + 35*s); ctx.lineTo(drawX - 10*s, drawY + 15*s); ctx.fill(); ctx.stroke();
                     // Flame
                     if (isMoving) {
                         ctx.fillStyle = '#ffeb3b';
-                        ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 5*s); ctx.lineTo(drawX - 60*s - (Math.random()*20*s), drawY); ctx.lineTo(drawX - 30*s, drawY + 5*s); ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 8*s); ctx.lineTo(drawX - 60*s - (Math.random()*20*s), drawY); ctx.lineTo(drawX - 30*s, drawY + 8*s); ctx.fill();
                     }
                 }
             }
 
             // Name Tag
             ctx.fillStyle = 'white';
-            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.font = `bold ${14*s}px 'Comic Sans MS', sans-serif`;
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 3*s;
+            ctx.strokeText(racer.name, pX, pY - (80*s));
             ctx.fillText(racer.name, pX, pY - (80*s));
-            ctx.shadowBlur = 0;
             ctx.textAlign = 'left';
 
             return; // Skip organic drawing
@@ -1473,6 +1576,7 @@
         let colorMain = racer.color;
         let colorDark = darkenColor(racer.color, 60); 
         let colorHoof = '#0a0505';
+        let strokeColor = '#000000'; // Cartoon outline
 
         function drawLimb(startX, startY, ang1, ang2, len1, len2, width, color) {
             let kneeX = startX + Math.sin(ang1) * len1;
@@ -1480,10 +1584,20 @@
             let hoofX = kneeX + Math.sin(ang1 + ang2) * len2;
             let hoofY = kneeY + Math.cos(ang1 + ang2) * len2;
 
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
+            // Outline
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = width + (4*s);
             ctx.lineCap = 'round'; ctx.lineJoin = 'round';
             ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(kneeX, kneeY); ctx.lineTo(hoofX, hoofY); ctx.stroke();
+
+            // Fill
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(kneeX, kneeY); ctx.lineTo(hoofX, hoofY); ctx.stroke();
+
+            // Hoof
+            ctx.fillStyle = strokeColor;
+            ctx.beginPath(); ctx.arc(hoofX, hoofY, (width * 0.6) + (2*s), 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = colorHoof;
             ctx.beginPath(); ctx.arc(hoofX, hoofY, width * 0.6, 0, Math.PI * 2); ctx.fill();
         }
@@ -1544,42 +1658,52 @@
             drawLimb(chestX, chestY + (5*s), ff.u, ff.l, 18*s, 22*s, 8*s, colorDark);
 
             // Tail Based on Type
-            ctx.strokeStyle = colorDark;
-            ctx.fillStyle = colorDark;
             if (animTypeInfo.tail === 'long') {
                 let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
                 let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
-                ctx.lineWidth = 6 * s;
+
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = (6 * s) + (4*s);
                 ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
-                ctx.quadraticCurveTo(rumpX - (30*s) - tailStretch, rumpY - (5*s) + tailWhip, rumpX - (25*s) - tailStretch, rumpY + (20*s));
+                ctx.beginPath(); ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
+                ctx.quadraticCurveTo(rumpX - (30*s) - tailStretch, rumpY - (5*s) + tailWhip, rumpX - (25*s) - tailStretch, rumpY + (20*s)); ctx.stroke();
+
+                ctx.strokeStyle = colorDark;
+                ctx.lineWidth = 6 * s;
                 ctx.stroke();
             } else if (animTypeInfo.tail === 'thin') {
                 let tailWhip = isMoving ? Math.sin(cycle * 3) * 15 * s : 0;
-                ctx.lineWidth = 3 * s;
-                ctx.beginPath();
-                ctx.moveTo(rumpX - (15*s), rumpY - (10*s));
-                ctx.lineTo(rumpX - (25*s) + tailWhip, rumpY + (15*s));
-                ctx.stroke();
+                ctx.strokeStyle = strokeColor; ctx.lineWidth = (3 * s) + (4*s); ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(rumpX - (15*s), rumpY - (10*s)); ctx.lineTo(rumpX - (25*s) + tailWhip, rumpY + (15*s)); ctx.stroke();
+
+                ctx.strokeStyle = colorDark; ctx.lineWidth = 3 * s; ctx.stroke();
+
                 // Tuft
-                ctx.beginPath();
-                ctx.arc(rumpX - (25*s) + tailWhip, rumpY + (15*s), 4*s, 0, Math.PI*2);
-                ctx.fill();
+                ctx.fillStyle = strokeColor; ctx.beginPath(); ctx.arc(rumpX - (25*s) + tailWhip, rumpY + (15*s), (4*s) + (2*s), 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = colorDark; ctx.beginPath(); ctx.arc(rumpX - (25*s) + tailWhip, rumpY + (15*s), 4*s, 0, Math.PI*2); ctx.fill();
             } else if (animTypeInfo.tail === 'stub') {
                 let tailWhip = isMoving ? Math.sin(cycle * 5) * 3 * s : 0;
-                ctx.beginPath();
-                ctx.ellipse(rumpX - (16*s), rumpY - (10*s) + tailWhip, 6*s, 3*s, -Math.PI/4, 0, Math.PI*2);
-                ctx.fill();
+                ctx.fillStyle = strokeColor; ctx.beginPath(); ctx.ellipse(rumpX - (16*s), rumpY - (10*s) + tailWhip, (6*s)+(2*s), (3*s)+(2*s), -Math.PI/4, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = colorDark; ctx.beginPath(); ctx.ellipse(rumpX - (16*s), rumpY - (10*s) + tailWhip, 6*s, 3*s, -Math.PI/4, 0, Math.PI*2); ctx.fill();
             }
 
-            // Body Mass
+            // Body Mass (Cartoon style uses a single path for outlining)
             ctx.fillStyle = colorMain;
-            ctx.beginPath();
-            ctx.moveTo(chestX, chestY - (15*s)); ctx.lineTo(rumpX, rumpY - (12*s));
-            ctx.lineTo(rumpX, rumpY + (12*s)); ctx.lineTo(chestX, chestY + (15*s)); ctx.fill();
-            ctx.beginPath(); ctx.arc(rumpX, rumpY, 16*s, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(chestX, chestY, 18*s, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 4 * s;
+            ctx.lineJoin = 'round';
+
+            // Draw an outline around the whole body shape
+            let bodyPath = new Path2D();
+            bodyPath.moveTo(chestX, chestY - (15*s));
+            bodyPath.lineTo(rumpX, rumpY - (12*s));
+            bodyPath.arc(rumpX, rumpY, 16*s, -Math.PI/2, Math.PI/2, true);
+            bodyPath.lineTo(chestX, chestY + (15*s));
+            bodyPath.arc(chestX, chestY, 18*s, Math.PI/2, -Math.PI/2, true);
+            bodyPath.closePath();
+
+            ctx.fill(bodyPath);
+            ctx.stroke(bodyPath);
 
             // Neck and Head
             let neckBaseX = chestX + (10*s);
@@ -1588,64 +1712,112 @@
             headX = neckBaseX + (20*s) + (Math.cos(pitch)*10*s);
             headY = neckBaseY - (25*s) + headDip;
 
+            // Neck
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = (14 * s) + (4*s);
+            ctx.beginPath(); ctx.moveTo(neckBaseX, neckBaseY); ctx.lineTo(headX - (5*s), headY + (5*s)); ctx.stroke();
+
             ctx.strokeStyle = colorMain;
             ctx.lineWidth = 14 * s;
-            ctx.beginPath(); ctx.moveTo(neckBaseX, neckBaseY); ctx.lineTo(headX - (5*s), headY + (5*s)); ctx.stroke();
+            ctx.stroke();
 
             // Mane (Flowing behind neck) if horse
             if (animTypeInfo.tail === 'long') {
                 let tailStretch = isMoving ? (racer.speed / racer.maxSpeed) * 30 * s : 0;
                 let tailWhip = isMoving ? Math.sin(cycle * 4) * 10 * s : 0;
+
+                let manePath = new Path2D();
+                manePath.moveTo(neckBaseX - (5*s), neckBaseY - (10*s));
+                manePath.lineTo(headX - (10*s), headY - (5*s));
+                manePath.lineTo(headX - (25*s) - tailStretch*0.5, headY + (5*s) + tailWhip*0.5);
+                manePath.closePath();
+
                 ctx.fillStyle = colorDark;
-                ctx.beginPath();
-                ctx.moveTo(neckBaseX - (5*s), neckBaseY - (10*s));
-                ctx.lineTo(headX - (10*s), headY - (5*s));
-                ctx.lineTo(headX - (25*s) - tailStretch*0.5, headY + (5*s) + tailWhip*0.5);
-                ctx.fill();
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 3*s;
+                ctx.fill(manePath);
+                ctx.stroke(manePath);
             }
 
-            // Head Shape
-            ctx.fillStyle = colorMain;
-            ctx.beginPath();
-            ctx.moveTo(headX - (10*s), headY + (5*s)); ctx.lineTo(headX + (15*s), headY + (10*s));
-            ctx.lineTo(headX + (18*s), headY + (2*s)); ctx.lineTo(headX + (5*s), headY - (8*s));
-            ctx.lineTo(headX - (8*s), headY - (5*s)); ctx.fill();
+            // Head Shape (More cartoonish, rounded snout)
+            let headPath = new Path2D();
+            headPath.moveTo(headX - (10*s), headY + (5*s));
+            headPath.lineTo(headX + (10*s), headY + (10*s));
+            headPath.quadraticCurveTo(headX + (20*s), headY + (5*s), headX + (18*s), headY - (2*s));
+            headPath.lineTo(headX + (5*s), headY - (12*s));
+            headPath.lineTo(headX - (10*s), headY - (5*s));
+            headPath.closePath();
 
+            ctx.fillStyle = colorMain;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3 * s;
+            ctx.fill(headPath);
+            ctx.stroke(headPath);
+
+            // Ears
             ctx.fillStyle = colorDark;
-            ctx.beginPath(); ctx.moveTo(headX - (5*s), headY - (5*s)); ctx.lineTo(headX - (8*s), headY - (16*s) + (pitch*5*s)); ctx.lineTo(headX, headY - (5*s)); ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(headX - (5*s), headY - (12*s) + (pitch*5*s), 4*s, 8*s, Math.PI/6, 0, Math.PI*2);
+            ctx.fill(); ctx.stroke();
+
+            // Big Cartoon Eye
+            ctx.fillStyle = '#ffffff'; // White of eye
+            ctx.beginPath();
+            ctx.ellipse(headX + (5*s), headY - (2*s), 5*s, 6*s, 0, 0, Math.PI*2);
+            ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#000000'; // Pupil
+            // Pupil looks forward
+            let pupilOffset = isMoving ? 2*s : 0;
+            ctx.beginPath();
+            ctx.arc(headX + (5*s) + pupilOffset, headY - (2*s), 2.5*s, 0, Math.PI*2);
+            ctx.fill();
+
+            // Snout/Nostril
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(headX + (15*s), headY + (5*s), 1.5*s, 0, Math.PI*2);
+            ctx.fill();
 
             // Horns or Antlers
             if (animTypeInfo.horns) {
-                ctx.strokeStyle = '#e0e0e0';
+                ctx.fillStyle = '#e0e0e0';
+                ctx.strokeStyle = strokeColor;
                 ctx.lineWidth = 3 * s;
                 ctx.lineCap = 'round';
-                ctx.beginPath();
-                ctx.moveTo(headX - 2*s, headY - 5*s);
-                ctx.quadraticCurveTo(headX + 15*s, headY - 15*s + headDip, headX + 22*s, headY - 20*s + headDip);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(headX, headY - 4*s);
-                ctx.quadraticCurveTo(headX + 18*s, headY - 12*s + headDip, headX + 25*s, headY - 18*s + headDip);
-                ctx.stroke();
+
+                let hornPath1 = new Path2D();
+                hornPath1.moveTo(headX - 2*s, headY - 5*s);
+                hornPath1.quadraticCurveTo(headX + 15*s, headY - 15*s + headDip, headX + 22*s, headY - 20*s + headDip);
+                hornPath1.quadraticCurveTo(headX + 10*s, headY - 25*s + headDip, headX - 5*s, headY - 10*s);
+                ctx.fill(hornPath1); ctx.stroke(hornPath1);
+
+                let hornPath2 = new Path2D();
+                hornPath2.moveTo(headX, headY - 4*s);
+                hornPath2.quadraticCurveTo(headX + 18*s, headY - 12*s + headDip, headX + 25*s, headY - 18*s + headDip);
+                hornPath2.quadraticCurveTo(headX + 12*s, headY - 22*s + headDip, headX - 2*s, headY - 8*s);
+                ctx.fill(hornPath2); ctx.stroke(hornPath2);
+
             } else if (animTypeInfo.antlers) {
                 ctx.fillStyle = '#d7ccc8';
-                ctx.strokeStyle = '#d7ccc8';
-                ctx.lineWidth = 2 * s;
-                ctx.beginPath();
-                ctx.moveTo(headX - 5*s, headY - 5*s);
-                ctx.lineTo(headX - 10*s, headY - 20*s + headDip);
-                ctx.lineTo(headX - 5*s, headY - 30*s + headDip);
-                ctx.stroke();
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 3 * s;
+                ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-                ctx.beginPath();
-                ctx.moveTo(headX - 10*s, headY - 20*s + headDip);
-                ctx.lineTo(headX - 20*s, headY - 25*s + headDip);
-                ctx.stroke();
+                let antlerPath = new Path2D();
+                antlerPath.moveTo(headX - 5*s, headY - 5*s);
+                antlerPath.lineTo(headX - 10*s, headY - 20*s + headDip);
+                antlerPath.lineTo(headX - 5*s, headY - 30*s + headDip);
+
+                antlerPath.moveTo(headX - 10*s, headY - 20*s + headDip);
+                antlerPath.lineTo(headX - 20*s, headY - 25*s + headDip);
+
+                ctx.stroke(antlerPath);
 
                 // Palmation
                 ctx.beginPath();
                 ctx.ellipse(headX - 12*s, headY - 25*s + headDip, 10*s, 6*s, Math.PI/4, 0, Math.PI*2);
-                ctx.fill();
+                ctx.fill(); ctx.stroke();
             }
 
             // Near Legs
@@ -1662,6 +1834,52 @@
         let legWidth = rShape === 'large' ? 10 : (rShape === 'small' ? 5 : 8);
         let heightMult = rShape === 'tall' ? 1.4 : (rShape === 'small' ? 0.8 : 1.0);
 
+        // Helper for drawing rider IK limbs with outlines
+        function drawRiderIKLimb(startX, startY, endX, endY, len1, len2, width, color, invertKnee = false) {
+            let dx = endX - startX;
+            let dy = endY - startY;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > len1 + len2) {
+                let ratio = (len1 + len2) / dist;
+                endX = startX + dx * ratio;
+                endY = startY + dy * ratio;
+                dist = len1 + len2;
+            }
+
+            let a = len1;
+            let b = len2;
+            let c = dist;
+            let baseAngle = Math.atan2(dy, dx);
+            let acosVal = (a * a + c * c - b * b) / (2 * a * c);
+            acosVal = Math.max(-1, Math.min(1, acosVal));
+            let innerAngle = Math.acos(acosVal);
+            let jointAngle = invertKnee ? baseAngle - innerAngle : baseAngle + innerAngle;
+            let jointX = startX + Math.cos(jointAngle) * a;
+            let jointY = startY + Math.sin(jointAngle) * a;
+
+            // Outline
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = width + (4*s);
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(jointX, jointY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            // Fill
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.stroke();
+
+            // Hand/Foot ball
+            ctx.fillStyle = strokeColor;
+            ctx.beginPath(); ctx.arc(endX, endY, (width/2) + (2*s), 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(endX, endY, width/2, 0, Math.PI*2); ctx.fill();
+        }
+
         if (animTypeInfo.isHuman) {
             let runnerX = pX;
             let runnerY = pY + (5 * s); // Ground level
@@ -1673,19 +1891,15 @@
 
             // Helper to build realistic foot trajectory (ellipse-like)
             function getFootPos(t) {
-                // Return {x, y} relative to runnerX, runnerY based on 0-1 cycle
-                // t=0 is planting foot forward, t=0.5 is sweeping back, t=1 is snapping forward again
                 let stride = isMoving ? 45 * s * (0.5 + sprintSpeed * 0.5) : 10 * s;
                 let lift = isMoving ? 30 * s * (0.3 + sprintSpeed * 0.7) : 0;
 
                 let fx, fy;
                 if (t < 0.5) {
-                    // Foot sweeping back on ground
                     let sweepT = t / 0.5; // 0 to 1
                     fx = Math.cos(sweepT * Math.PI) * stride; // stride to -stride
                     fy = 0;
                 } else {
-                    // Foot recovering in air
                     let airT = (t - 0.5) / 0.5; // 0 to 1
                     fx = Math.cos(Math.PI + airT * Math.PI) * stride; // -stride to stride
                     fy = -Math.sin(airT * Math.PI) * lift; // Up and down
@@ -1698,7 +1912,6 @@
 
             // Calculate Hip Bounce (hips drop when feet are spread, rise when legs cross)
             let bounceScale = isMoving ? 8 * s * (0.5 + sprintSpeed * 0.5) : 0;
-            // The lowest point is t=0.25 and 0.75, highest is t=0 and 0.5
             let bounce1 = Math.sin(p1 * Math.PI * 2);
             let runnerBounce = isMoving ? Math.abs(bounce1) * bounceScale : 0;
 
@@ -1719,14 +1932,11 @@
             let armLen2 = 15 * s * heightMult;
 
             // Arm swinging (opposite to legs)
-            // If foot1 is forward (p1 near 0 or 1), hand1 is backward
             function getHandPos(t) {
                 let swing = isMoving ? 35 * s * (0.4 + sprintSpeed * 0.6) : 5 * s;
                 let armAng = Math.cos(t * Math.PI * 2) * Math.PI * 0.6; // Angle relative to torso
 
-                // Pure sine swing is too rigid, adding an offset to bend elbow
                 let hx = shoulderX - Math.cos(armAng) * swing;
-                // Hands should come up towards chest when forward, drop down when back
                 let hy = shoulderY + 15 * s + Math.sin(armAng) * swing * 0.5;
 
                 return { x: hx, y: hy };
@@ -1737,41 +1947,56 @@
 
             // DRAWING BACK LAYER
             // Back Arm (hand2 pairs with foot2, opposite of foot1)
-            drawIKLimb(shoulderX, shoulderY, hand2.x, hand2.y, armLen1, armLen2, armWidth * s, darkenColor(riderSkin, 20), false);
+            drawRiderIKLimb(shoulderX, shoulderY, hand2.x, hand2.y, armLen1, armLen2, armWidth * s, darkenColor(riderSkin, 20), false);
 
             // Back Leg (foot2)
-            drawIKLimb(hipX, hipY, foot2.x, foot2.y, thighLen, calfLen, legWidth * s, darkenColor(riderColor, 40), true);
+            drawRiderIKLimb(hipX, hipY, foot2.x, foot2.y, thighLen, calfLen, legWidth * s, darkenColor(riderColor, 40), true);
 
             // Body
-            ctx.strokeStyle = riderColor;
-            ctx.lineWidth = bodyWidth * s;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = (bodyWidth * s) + (4*s);
+            ctx.lineCap = 'round';
             ctx.beginPath(); ctx.moveTo(hipX, hipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
 
-            // Head
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = bodyWidth * s;
+            ctx.stroke();
+
+            // Head (Cartoon style)
             let headCenterX = shoulderX + Math.sin(lean) * (8*s);
             let headCenterY = shoulderY - Math.cos(lean) * (8*s);
-            let headSize = rShape === 'large' ? 8 : (rShape === 'small' ? 5 : 6);
-            ctx.fillStyle = riderSkin;
-            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill();
+            let headSize = rShape === 'large' ? 10 : (rShape === 'small' ? 7 : 8);
 
+            ctx.fillStyle = riderSkin;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2*s;
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+            // Cartoon Rider Eye
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.ellipse(headCenterX + (3*s), headCenterY - (1*s), 2.5*s, 3.5*s, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#000000';
+            ctx.beginPath(); ctx.arc(headCenterX + (4*s), headCenterY - (1*s), 1.5*s, 0, Math.PI*2); ctx.fill();
+
+            // Big Cowboy Hat
             ctx.fillStyle = '#4e342e';
-            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), headSize*2.3*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), headSize*1.2*s, Math.PI, 0); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (4*s), headSize*2.8*s, 3*s, lean, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (6*s), headSize*1.5*s, Math.PI, 0); ctx.fill(); ctx.stroke();
 
             // DRAWING FRONT LAYER
             // Front Leg (foot1)
-            drawIKLimb(hipX, hipY, foot1.x, foot1.y, thighLen, calfLen, legWidth * s, riderColor, true);
+            drawRiderIKLimb(hipX, hipY, foot1.x, foot1.y, thighLen, calfLen, legWidth * s, riderColor, true);
 
             // Front Arm (hand1)
-            drawIKLimb(shoulderX, shoulderY, hand1.x, hand1.y, armLen1, armLen2, armWidth * s, riderSkin, false);
+            drawRiderIKLimb(shoulderX, shoulderY, hand1.x, hand1.y, armLen1, armLen2, armWidth * s, riderSkin, false);
 
             // Name Tag
             ctx.fillStyle = 'white';
-            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.font = `bold ${14*s}px 'Comic Sans MS', sans-serif`;
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 3*s;
+            ctx.strokeText(racer.name, runnerX, hipY - (45*s) - runnerBounce);
             ctx.fillText(racer.name, runnerX, hipY - (45*s) - runnerBounce);
-            ctx.shadowBlur = 0;
             ctx.textAlign = 'left';
 
         } else {
@@ -1780,65 +2005,112 @@
             let saddleY = bodyY - (15 * s);
             let riderHipY = saddleY + riderBounce;
 
-            // Rider Back Leg
+            // Rider Back Leg (Simple V shape)
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = (legWidth * s) + (4*s);
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (10*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (5*s), riderHipY + (30*s)); ctx.stroke();
+
             ctx.strokeStyle = darkenColor(riderColor, 40);
             ctx.lineWidth = legWidth * s;
-            ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (10*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (5*s), riderHipY + (30*s)); ctx.stroke();
+            ctx.stroke();
+
+            // Back Foot
+            ctx.fillStyle = strokeColor; ctx.beginPath(); ctx.arc(saddleX + (5*s), riderHipY + (30*s), (legWidth/2*s)+(2*s), 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = darkenColor(riderColor, 40); ctx.beginPath(); ctx.arc(saddleX + (5*s), riderHipY + (30*s), legWidth/2*s, 0, Math.PI*2); ctx.fill();
 
             let lean = isMoving ? 0.4 + (racer.speed / racer.maxSpeed) * 0.4 : 0.1;
             let shoulderX = saddleX + Math.sin(lean) * 25 * s * heightMult;
             let shoulderY = riderHipY - Math.cos(lean) * 25 * s * heightMult;
 
-            ctx.strokeStyle = riderColor;
-            ctx.lineWidth = bodyWidth * s;
+            // Body
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = (bodyWidth * s) + (4*s);
             ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(shoulderX, shoulderY); ctx.stroke();
 
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = bodyWidth * s;
+            ctx.stroke();
+
+            // Head
             let headCenterX = shoulderX + (5*s);
             let headCenterY = shoulderY - (8*s);
-            let headSize = rShape === 'large' ? 8 : (rShape === 'small' ? 5 : 6);
-            ctx.fillStyle = riderSkin;
-            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill();
+            let headSize = rShape === 'large' ? 10 : (rShape === 'small' ? 7 : 8);
 
+            ctx.fillStyle = riderSkin;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2*s;
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY, headSize*s, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+            // Eye
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath(); ctx.ellipse(headCenterX + (3*s), headCenterY - (1*s), 2.5*s, 3.5*s, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#000000';
+            ctx.beginPath(); ctx.arc(headCenterX + (4*s), headCenterY - (1*s), 1.5*s, 0, Math.PI*2); ctx.fill();
+
+            // Big Hat
             ctx.fillStyle = '#4e342e';
-            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (2*s), headSize*2.3*s, 3*s, lean, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (4*s), headSize*1.2*s, Math.PI, 0); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(headCenterX, headCenterY - (4*s), headSize*2.8*s, 3*s, lean, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(headCenterX, headCenterY - (6*s), headSize*1.5*s, Math.PI, 0); ctx.fill(); ctx.stroke();
 
             let handX = headX - (5*s);
             let handY = headY - (5*s);
 
-            ctx.strokeStyle = '#3e2723';
+            // Reins
+            ctx.strokeStyle = strokeColor;
             ctx.lineWidth = 2 * s;
             ctx.beginPath(); ctx.moveTo(handX, handY); ctx.lineTo(headX + (10*s), headY + (5*s)); ctx.stroke();
 
-            ctx.strokeStyle = riderColor;
-            ctx.lineWidth = armWidth * s;
+            // Front Arm
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = (armWidth * s) + (4*s);
             ctx.beginPath(); ctx.moveTo(shoulderX, shoulderY); ctx.lineTo(shoulderX + (5*s), shoulderY + (10*s)); ctx.lineTo(handX, handY); ctx.stroke();
 
             ctx.strokeStyle = riderColor;
-            ctx.lineWidth = (legWidth+1) * s;
+            ctx.lineWidth = armWidth * s;
+            ctx.stroke();
+
+            // Hand
+            ctx.fillStyle = strokeColor; ctx.beginPath(); ctx.arc(handX, handY, (armWidth/2*s)+(2*s), 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = riderSkin; ctx.beginPath(); ctx.arc(handX, handY, armWidth/2*s, 0, Math.PI*2); ctx.fill();
+
+            // Front Leg
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = ((legWidth+1) * s) + (4*s);
             ctx.beginPath(); ctx.moveTo(saddleX, riderHipY); ctx.lineTo(saddleX + (12*s), riderHipY + (15*s)); ctx.lineTo(saddleX + (8*s), riderHipY + (32*s)); ctx.stroke();
-            ctx.fillStyle = '#212121';
-            ctx.beginPath(); ctx.arc(saddleX + (10*s), riderHipY + (32*s), 4*s, 0, Math.PI*2); ctx.fill();
+
+            ctx.strokeStyle = riderColor;
+            ctx.lineWidth = (legWidth+1) * s;
+            ctx.stroke();
+
+            // Boot
+            ctx.fillStyle = strokeColor; ctx.beginPath(); ctx.arc(saddleX + (10*s), riderHipY + (32*s), (4*s)+(2*s), 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#212121'; ctx.beginPath(); ctx.arc(saddleX + (10*s), riderHipY + (32*s), 4*s, 0, Math.PI*2); ctx.fill();
 
             // Name Tag
             ctx.fillStyle = 'white';
-            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.font = `bold ${14*s}px 'Comic Sans MS', sans-serif`;
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 3*s;
+            ctx.strokeText(racer.name, pX, riderHipY - (40*s));
             ctx.fillText(racer.name, pX, riderHipY - (40*s));
-            ctx.shadowBlur = 0;
             ctx.textAlign = 'left';
         }
     }
 
     function drawFloatingTexts() {
         floatingTexts.forEach(ft => {
-            ctx.fillStyle = ft.color;
-            ctx.font = `bold ${20 + (1-ft.life)*10}px Georgia`; 
+            let fontSize = 20 + (1-ft.life)*15;
+            ctx.font = `bold ${fontSize}px 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif`;
             ctx.globalAlpha = ft.life;
-            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = fontSize * 0.2;
+            ctx.strokeText(ft.text, ft.x, ft.y);
+
+            ctx.fillStyle = ft.color;
             ctx.fillText(ft.text, ft.x, ft.y);
-            ctx.shadowBlur = 0;
+
             ctx.globalAlpha = 1.0;
         });
     }
@@ -1847,57 +2119,75 @@
         let p = racers.find(r => r.isPlayer);
         if (!p) return;
 
-        ctx.fillStyle = '#ffcc80';
-        ctx.font = 'bold 22px Georgia';
-        ctx.shadowColor = 'black'; ctx.shadowBlur = 3;
-        ctx.fillText(`TIME: ${raceTimer.toFixed(2)}s`, 20, 35);
-        ctx.fillStyle = 'white';
-        ctx.fillText(`SPEED: ${Math.round(p.speed / 100)} km/h`, 20, 65);
+        ctx.font = "bold 24px 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif";
+
+        let drawTextHUD = (text, x, y, color) => {
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 4;
+            ctx.strokeText(text, x, y);
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        };
+
+        drawTextHUD(`TIME: ${raceTimer.toFixed(2)}s`, 20, 40, '#ffeb3b');
+        drawTextHUD(`SPEED: ${Math.round(p.speed / 100)} km/h`, 20, 75, '#ffffff');
 
         let flash = p.flashTimer > 0 && Math.floor(p.flashTimer / 3) % 2 === 0;
         let isSmallScreen = width < 500;
-        let stamX = isSmallScreen ? width - 150 : width - 250;
+        let stamX = isSmallScreen ? width - 160 : width - 280;
 
-        ctx.fillStyle = flash ? '#ff3300' : '#ffcc80';
-        if (!isSmallScreen) ctx.fillText(`STAMINA`, stamX, 35);
+        if (!isSmallScreen) drawTextHUD(`STAMINA`, stamX, 40, flash ? '#ff3d00' : '#ffeb3b');
         
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#3e2723';
-        ctx.fillRect(width - 150, 15, 130, 24);
+        // Stamina bar background
+        ctx.fillStyle = '#212121';
+        ctx.beginPath(); ctx.roundRect(width - 160, 15, 140, 28, 10); ctx.fill();
         
-        let stamGrad = ctx.createLinearGradient(width - 150, 0, width - 20, 0);
-        stamGrad.addColorStop(0, '#ff3300');
-        stamGrad.addColorStop(0.5, '#ffd700');
-        stamGrad.addColorStop(1, '#00ff00');
+        let stamGrad = ctx.createLinearGradient(width - 160, 0, width - 20, 0);
+        stamGrad.addColorStop(0, '#d50000');
+        stamGrad.addColorStop(0.5, '#ffd600');
+        stamGrad.addColorStop(1, '#00c853');
         ctx.fillStyle = stamGrad;
         
-        ctx.fillRect(width - 150, 15, p.stamina * 1.3, 24);
+        // Stamina fill
+        ctx.beginPath(); ctx.roundRect(width - 158, 17, (p.stamina * 1.36), 24, 8); ctx.fill();
         
-        ctx.strokeStyle = flash ? '#ff3300' : '#8d6e63';
-        ctx.lineWidth = flash ? 3 : 2;
-        ctx.strokeRect(width - 150, 15, 130, 24);
+        // Stamina border
+        ctx.strokeStyle = flash ? '#ff3d00' : '#ffffff';
+        ctx.lineWidth = flash ? 4 : 3;
+        ctx.beginPath(); ctx.roundRect(width - 160, 15, 140, 28, 10); ctx.stroke();
         ctx.lineWidth = 1;
 
-        ctx.fillStyle = '#ffcc80';
-        ctx.shadowBlur = 3;
-        ctx.fillText(`TRACK`, 20, height - 20);
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = 'rgba(30, 20, 15, 0.8)';
+        drawTextHUD(`TRACK`, 20, height - 20, '#ffeb3b');
+
         let barW = width - 140;
-        ctx.fillRect(100, height - 35, barW, 20);
         
-        ctx.strokeStyle = '#5d4037';
-        ctx.strokeRect(100, height - 35, barW, 20);
+        // Track background
+        ctx.fillStyle = '#3e2723';
+        ctx.beginPath(); ctx.roundRect(110, height - 38, barW, 26, 13); ctx.fill();
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.roundRect(110, height - 38, barW, 26, 13); ctx.stroke();
         
         racers.forEach(r => {
             let prog = Math.min(r.dist / trackLength, 1.0);
+            let headX = 110 + (barW * prog);
+
+            // Icon border
             ctx.fillStyle = r.color;
+            ctx.strokeStyle = r.isPlayer ? '#76ff03' : '#ffffff';
+            ctx.lineWidth = r.isPlayer ? 4 : 2;
+
             ctx.beginPath();
-            ctx.arc(100 + (barW * prog), height - 25, 9, 0, Math.PI*2);
+            ctx.arc(headX, height - 25, 12, 0, Math.PI*2);
             ctx.fill();
-            ctx.strokeStyle = r.isPlayer ? '#00ff00' : '#ffffff';
-            ctx.lineWidth = r.isPlayer ? 3 : 2;
             ctx.stroke();
+
+            if (r.isPlayer) {
+                // Little player icon eye
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(headX+2, height-27, 3, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(headX+3, height-27, 1.5, 0, Math.PI*2); ctx.fill();
+            }
         });
         ctx.lineWidth = 1;
     }

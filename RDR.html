@@ -234,6 +234,43 @@
             
             <button class="action-btn" onclick="startRace()">Enter Next Race</button>
             <button class="action-btn" style="background: #4fc3f7; color: #01579b; border-bottom-color: #0277bd; margin-top: 10px;" onclick="openCustomRaceMenu()">Custom Race</button>
+            <button class="action-btn" style="background: #e91e63; color: #fce4ec; border-bottom-color: #c2185b; margin-top: 10px;" onclick="openCareerMenu()">Go to Career Mode</button>
+        </div>
+
+        <!-- CAREER OVERLAY -->
+        <div id="career-ui" class="overlay hidden">
+            <div class="menu-title" style="color:#e91e63; text-shadow: 2px 2px 0px #880e4f;">Career Locker Room</div>
+            <div class="stats-bar">Career Funds: $<span id="career-money-display">0</span> | Current Cup: <span id="career-cup-display" style="color:#ffcc80;"></span></div>
+
+            <div class="shop-grid">
+                <div class="shop-item">
+                    <h4>Top Speed (Lvl <span id="career-lvl-speed">1</span>)</h4>
+                    <p>Increases maximum sprint velocity.</p>
+                    <button id="career-btn-speed" onclick="buyCareerUpgrade('speed')">Buy: $50</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Acceleration (Lvl <span id="career-lvl-accel">1</span>)</h4>
+                    <p>More speed gained per perfect hit.</p>
+                    <button id="career-btn-accel" onclick="buyCareerUpgrade('accel')">Buy: $50</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Stamina Lungs (Lvl <span id="career-lvl-stamina">1</span>)</h4>
+                    <p>Reduces stamina cost & boosts regen.</p>
+                    <button id="career-btn-stamina" onclick="buyCareerUpgrade('stamina')">Buy: $50</button>
+                </div>
+                <div class="shop-item">
+                    <h4>Spur Impact (Lvl <span id="career-lvl-assist">1</span>)</h4>
+                    <p>Increases speed burst gained per tap.</p>
+                    <button id="career-btn-assist" onclick="buyCareerUpgrade('assist')">Buy: $50</button>
+                </div>
+            </div>
+
+            <div style="color: #bcaaa4; margin-bottom: 20px; font-family: 'Courier New', monospace; text-align: center;">
+                Note: In Career Mode, you strictly sprint on foot.<br>Upgrades have no level cap!
+            </div>
+
+            <button class="action-btn" style="background: #e91e63; color: #fce4ec; border-bottom-color: #c2185b;" onclick="startCareerRace()">Enter Career Race</button>
+            <button class="action-btn" style="background: #e57373; margin-top: 10px;" onclick="openShop()">Back to Main Menu</button>
         </div>
 
         <!-- CUSTOM RACE OVERLAY -->
@@ -264,7 +301,7 @@
                 <!-- Filled via JS -->
             </div>
             <div class="stats-bar">Prize Money: $<span id="prize-display">0</span></div>
-            <button class="action-btn" onclick="openShop()">Return to Stables</button>
+            <button id="results-return-btn" class="action-btn" onclick="handleRaceReturn()">Return to Stables</button>
         </div>
     </div>
 
@@ -292,10 +329,14 @@
     // --- META GAME STATE ---
     let gameState = 'SHOP'; 
     let money = 0;
+    let careerMoney = 0;
     
     // Upgrades System
     let upgrades = { speed: 1, accel: 1, stamina: 1, assist: 1 };
     function getUpgradeCost(type) { return upgrades[type] * 50; }
+
+    let careerUpgrades = { speed: 1, accel: 1, stamina: 1, assist: 1 };
+    function getCareerUpgradeCost(type) { return Math.floor(50 * Math.pow(1.5, careerUpgrades[type] - 1)); }
 
     // --- RIDER TYPES ---
     const RIDER_TYPES = {
@@ -328,7 +369,21 @@
         tiger: { name: "Bengal Tiger", runStyle: 'bound', cost: 6500, spd: 6500, acc: 3000, drain: 4.5, reg: 0.8, color: '#e57373', scale: 1.05, horns: false, antlers: false, tail: 'long', desc: "Fearsome velocity." },
         elephant: { name: "War Elephant", runStyle: 'lumber', cost: 8000, spd: 4000, acc: 1500, drain: 3.5, reg: 0.5, color: '#9e9e9e', scale: 1.6, horns: true, antlers: false, tail: 'thin', desc: "Earth-shaking power, terrible cardio." },
         triceratops: { name: "Triceratops", runStyle: 'lumber', cost: 12000, spd: 3000, acc: 1200, drain: 2.5, reg: 0.8, color: '#81c784', scale: 1.4, horns: true, antlers: false, tail: 'long', desc: "Extinct, huge, logically quite slow." },
-        unicorn: { name: "Mystic Unicorn", runStyle: 'gallop', cost: 20000, spd: 9500, acc: 4000, drain: 1.5, reg: 2.0, color: '#f8bbd0', scale: 1.0, horns: true, antlers: false, tail: 'long', desc: "The ultimate magical mount." }
+        unicorn: { name: "Mystic Unicorn", runStyle: 'gallop', cost: 20000, spd: 9500, acc: 4000, drain: 1.5, reg: 2.0, color: '#f8bbd0', scale: 1.0, horns: true, antlers: false, tail: 'long', desc: "The ultimate magical mount." },
+
+        // CAREER VEHICLES
+        walker: { name: "Walker", runStyle: 'vehicle_slow', cost: 0, spd: 1000, acc: 200, drain: 1.0, reg: 1.0, color: '#bdbdbd', scale: 0.8, isVehicle: true, desc: "Very slow." },
+        wheelchair: { name: "Wheelchair", runStyle: 'vehicle_slow', cost: 0, spd: 1500, acc: 400, drain: 1.0, reg: 1.0, color: '#757575', scale: 0.9, isVehicle: true, desc: "Rolling slow." },
+        bicycle: { name: "Bicycle", runStyle: 'vehicle_bike', cost: 0, spd: 3000, acc: 800, drain: 1.0, reg: 1.0, color: '#f44336', scale: 0.9, isVehicle: true, desc: "Pedal power." },
+        golfcart: { name: "Golf Cart", runStyle: 'vehicle_car', cost: 0, spd: 4000, acc: 1000, drain: 1.0, reg: 1.0, color: '#e0f7fa', scale: 1.1, isVehicle: true, desc: "Electric slow." },
+        scooter: { name: "Electric Scooter", runStyle: 'vehicle_bike', cost: 0, spd: 4500, acc: 1500, drain: 1.0, reg: 1.0, color: '#212121', scale: 0.8, isVehicle: true, desc: "City zip." },
+        motorcycle: { name: "Motorcycle", runStyle: 'vehicle_bike', cost: 0, spd: 7500, acc: 2500, drain: 1.0, reg: 1.0, color: '#b71c1c', scale: 1.0, isVehicle: true, desc: "Highway fast." },
+        sedan: { name: "Sedan", runStyle: 'vehicle_car', cost: 0, spd: 8500, acc: 2000, drain: 1.0, reg: 1.0, color: '#90caf9', scale: 1.3, isVehicle: true, desc: "Daily driver." },
+        sportscar: { name: "Sports Car", runStyle: 'vehicle_car', cost: 0, spd: 11000, acc: 3500, drain: 1.0, reg: 1.0, color: '#ffeb3b', scale: 1.2, isVehicle: true, desc: "Street racer." },
+        f1car: { name: "F1 Car", runStyle: 'vehicle_car', cost: 0, spd: 14000, acc: 5000, drain: 1.0, reg: 1.0, color: '#d32f2f', scale: 1.3, isVehicle: true, desc: "Track pro." },
+        helicopter: { name: "Helicopter", runStyle: 'aircraft_heli', cost: 0, spd: 16000, acc: 3000, drain: 1.0, reg: 1.0, color: '#37474f', scale: 1.5, isVehicle: true, desc: "Airborne." },
+        plane: { name: "Jet Plane", runStyle: 'aircraft_jet', cost: 0, spd: 22000, acc: 6000, drain: 1.0, reg: 1.0, color: '#eceff1', scale: 1.8, isVehicle: true, desc: "Fighter speed." },
+        rocket: { name: "Rocket Ship", runStyle: 'aircraft_rocket', cost: 0, spd: 35000, acc: 10000, drain: 1.0, reg: 1.0, color: '#ff9800', scale: 2.0, isVehicle: true, desc: "Orbital velocity." }
     };
     let unlockedAnimals = ['human'];
     let selectedAnimal = 'human';
@@ -349,6 +404,33 @@
                 { name: "Star Weaver", anim: 'unicorn', color: '#f8bbd0', riderColor: '#1565c0', baseSpeed: 9500, perfChance: 0.85 } ] }
     ];
     let currentTourney = 0;
+
+    const careerTournaments = [
+        { name: "Nursing Home", prize: 50, length: 10000, ai: [{ name: "Old Man Jenkins", anim: 'walker', color: '#bdbdbd', riderColor: '#bdbdbd', baseSpeed: 1000, perfChance: 0.1 }, { name: "Granny Smith", anim: 'walker', color: '#e0e0e0', riderColor: '#e0e0e0', baseSpeed: 950, perfChance: 0.1 }] },
+        { name: "Hospital Dash", prize: 100, length: 15000, ai: [{ name: "Patient Zero", anim: 'wheelchair', color: '#757575', riderColor: '#757575', baseSpeed: 1500, perfChance: 0.2 }, { name: "Speedy Recovery", anim: 'wheelchair', color: '#9e9e9e', riderColor: '#9e9e9e', baseSpeed: 1600, perfChance: 0.2 }] },
+        { name: "Swamp Waddle", prize: 150, length: 18000, ai: [{ name: "Snapper", anim: 'turtle', color: '#4caf50', riderColor: '#1b5e20', baseSpeed: 1800, perfChance: 0.3 }, { name: "Porky", anim: 'pig', color: '#f8bbd0', riderColor: '#880e4f', baseSpeed: 2000, perfChance: 0.3 }] },
+        { name: "Farm Kids", prize: 250, length: 30000, ai: [{ name: "Billy", anim: 'bicycle', color: '#f44336', riderColor: '#f44336', baseSpeed: 3000, perfChance: 0.4 }, { name: "Timmy", anim: 'bicycle', color: '#2196f3', riderColor: '#2196f3', baseSpeed: 3200, perfChance: 0.4 }] },
+        { name: "Local Hands", prize: 400, length: 40000, ai: [{ name: "Stubborn", anim: 'donkey', color: '#9e9e9e', riderColor: '#4e342e', baseSpeed: 4000, perfChance: 0.5 }, { name: "Prince", anim: 'corgi', color: '#ffb74d', riderColor: '#e65100', baseSpeed: 4200, perfChance: 0.5 }] },
+        { name: "Golf Course", prize: 600, length: 50000, ai: [{ name: "Fore", anim: 'golfcart', color: '#e0f7fa', riderColor: '#e0f7fa', baseSpeed: 5000, perfChance: 0.6 }, { name: "Eagle", anim: 'golfcart', color: '#ffffff', riderColor: '#ffffff', baseSpeed: 5500, perfChance: 0.6 }] },
+        { name: "Heavy Hitters", prize: 900, length: 60000, ai: [{ name: "Grizzly", anim: 'bear', color: '#4e342e', riderColor: '#3e2723', baseSpeed: 6000, perfChance: 0.65 }, { name: "Toro", anim: 'bull', color: '#3e2723', riderColor: '#1a1a1a', baseSpeed: 6500, perfChance: 0.65 }] },
+        { name: "Wild Dash", prize: 1200, length: 70000, ai: [{ name: "Antlers", anim: 'moose', color: '#5d4037', riderColor: '#1b5e20', baseSpeed: 7000, perfChance: 0.7 }, { name: "Stripes", anim: 'zebra', color: '#e0e0e0', riderColor: '#212121', baseSpeed: 7500, perfChance: 0.7 }] },
+        { name: "City Streets", prize: 1800, length: 80000, ai: [{ name: "Commuter A", anim: 'scooter', color: '#212121', riderColor: '#212121', baseSpeed: 8000, perfChance: 0.75 }, { name: "Commuter B", anim: 'scooter', color: '#424242', riderColor: '#424242', baseSpeed: 8500, perfChance: 0.75 }] },
+        { name: "Tundra Sprint", prize: 2500, length: 90000, ai: [{ name: "Howler", anim: 'wolf', color: '#757575', riderColor: '#212121', baseSpeed: 9000, perfChance: 0.8 }, { name: "Prancer", anim: 'caribou', color: '#a1887f', riderColor: '#3e2723', baseSpeed: 9500, perfChance: 0.8 }] },
+        { name: "Desert Run", prize: 3500, length: 100000, ai: [{ name: "Humps", anim: 'camel', color: '#c2b280', riderColor: '#8d6e63', baseSpeed: 10000, perfChance: 0.85 }, { name: "King", anim: 'lion', color: '#e5c158', riderColor: '#ffb300', baseSpeed: 10500, perfChance: 0.85 }] },
+        { name: "Highway Cruisers", prize: 5000, length: 110000, ai: [{ name: "Biker 1", anim: 'motorcycle', color: '#b71c1c', riderColor: '#b71c1c', baseSpeed: 11000, perfChance: 0.85 }, { name: "Biker 2", anim: 'motorcycle', color: '#1a237e', riderColor: '#1a237e', baseSpeed: 11500, perfChance: 0.85 }] },
+        { name: "Jungle Chase", prize: 7000, length: 120000, ai: [{ name: "Roar", anim: 'tiger', color: '#e57373', riderColor: '#b71c1c', baseSpeed: 12000, perfChance: 0.9 }, { name: "Stomp", anim: 'elephant', color: '#9e9e9e', riderColor: '#424242', baseSpeed: 12500, perfChance: 0.9 }] },
+        { name: "Daily Commute", prize: 10000, length: 130000, ai: [{ name: "Driver A", anim: 'sedan', color: '#90caf9', riderColor: '#90caf9', baseSpeed: 13000, perfChance: 0.9 }, { name: "Driver B", anim: 'sedan', color: '#a5d6a7', riderColor: '#a5d6a7', baseSpeed: 13500, perfChance: 0.9 }] },
+        { name: "Prehistoric", prize: 15000, length: 140000, ai: [{ name: "Trike 1", anim: 'triceratops', color: '#81c784', riderColor: '#1b5e20', baseSpeed: 14000, perfChance: 0.95 }, { name: "Trike 2", anim: 'triceratops', color: '#4caf50', riderColor: '#1b5e20', baseSpeed: 14500, perfChance: 0.95 }] },
+        { name: "Champion Racers", prize: 20000, length: 150000, ai: [{ name: "Champ", anim: 'horse', color: '#8d6e63', riderColor: '#3e2723', baseSpeed: 15000, perfChance: 0.95 }, { name: "Swift", anim: 'zebra', color: '#e0e0e0', riderColor: '#212121', baseSpeed: 15500, perfChance: 0.95 }] },
+        { name: "Street Drag", prize: 30000, length: 165000, ai: [{ name: "Racer X", anim: 'sportscar', color: '#ffeb3b', riderColor: '#ffeb3b', baseSpeed: 16500, perfChance: 0.95 }, { name: "Racer Y", anim: 'sportscar', color: '#ff5722', riderColor: '#ff5722', baseSpeed: 17000, perfChance: 0.95 }] },
+        { name: "Mythical Run", prize: 50000, length: 180000, ai: [{ name: "Magic", anim: 'unicorn', color: '#f8bbd0', riderColor: '#c2185b', baseSpeed: 18000, perfChance: 0.98 }, { name: "Sparkle", anim: 'unicorn', color: '#e1bee7', riderColor: '#7b1fa2', baseSpeed: 18500, perfChance: 0.98 }] },
+        { name: "Pro Circuit", prize: 80000, length: 200000, ai: [{ name: "Pro 1", anim: 'f1car', color: '#d32f2f', riderColor: '#d32f2f', baseSpeed: 20000, perfChance: 0.98 }, { name: "Pro 2", anim: 'f1car', color: '#1976d2', riderColor: '#1976d2', baseSpeed: 20500, perfChance: 0.98 }] },
+        { name: "News Choppers", prize: 150000, length: 220000, ai: [{ name: "Chopper 1", anim: 'helicopter', color: '#37474f', riderColor: '#37474f', baseSpeed: 22000, perfChance: 0.99 }, { name: "Chopper 2", anim: 'helicopter', color: '#455a64', riderColor: '#455a64', baseSpeed: 22500, perfChance: 0.99 }] },
+        { name: "Jet Fighters", prize: 300000, length: 250000, ai: [{ name: "Maverick", anim: 'plane', color: '#eceff1', riderColor: '#eceff1', baseSpeed: 25000, perfChance: 0.99 }, { name: "Goose", anim: 'plane', color: '#cfd8dc', riderColor: '#cfd8dc', baseSpeed: 26000, perfChance: 0.99 }] },
+        { name: "Orbit", prize: 1000000, length: 350000, ai: [{ name: "Apollo", anim: 'rocket', color: '#ff9800', riderColor: '#ff9800', baseSpeed: 35000, perfChance: 1.0 }, { name: "Ares", anim: 'rocket', color: '#f44336', riderColor: '#f44336', baseSpeed: 36000, perfChance: 1.0 }] }
+    ];
+    let currentCareerTourney = 0;
+    let isCareerRace = false;
 
     // --- RACE STATE VARIABLES ---
     const fps = 60;
@@ -402,6 +484,7 @@
 
         for (let key in ANIMAL_TYPES) {
             let anim = ANIMAL_TYPES[key];
+            if (anim.isVehicle) continue; // Hide Career vehicles from the standard shop
             let isUnlocked = unlockedAnimals.includes(key);
             let nameDisplay = isUnlocked ? anim.name : `${anim.name} ($${anim.cost})`;
             
@@ -541,12 +624,44 @@
         }
     }
 
+    function updateCareerUI() {
+        document.getElementById('career-money-display').innerText = careerMoney;
+        document.getElementById('career-cup-display').innerText = careerTournaments[Math.min(currentCareerTourney, careerTournaments.length-1)].name;
+
+        ['speed', 'accel', 'stamina', 'assist'].forEach(type => {
+            document.getElementById(`career-lvl-${type}`).innerText = careerUpgrades[type];
+            let btn = document.getElementById(`career-btn-${type}`);
+            let cost = getCareerUpgradeCost(type);
+            btn.innerText = `Buy: $${cost}`;
+            btn.disabled = (careerMoney < cost); // No level cap
+        });
+    }
+
+    function buyCareerUpgrade(type) {
+        let cost = getCareerUpgradeCost(type);
+        if (careerMoney >= cost) {
+            careerMoney -= cost;
+            careerUpgrades[type]++;
+            updateCareerUI();
+        }
+    }
+
     function openShop() {
         gameState = 'SHOP';
         document.getElementById('shop-ui').classList.remove('hidden');
+        document.getElementById('career-ui').classList.add('hidden');
         document.getElementById('results-ui').classList.add('hidden');
         document.getElementById('custom-race-ui').classList.add('hidden');
         updateShopUI();
+    }
+
+    function openCareerMenu() {
+        gameState = 'CAREER_MENU';
+        document.getElementById('shop-ui').classList.add('hidden');
+        document.getElementById('results-ui').classList.add('hidden');
+        document.getElementById('custom-race-ui').classList.add('hidden');
+        document.getElementById('career-ui').classList.remove('hidden');
+        updateCareerUI();
     }
 
     function openCustomRaceMenu() {
@@ -565,8 +680,17 @@
 
     function startRace() {
         isCustomRace = false;
+        isCareerRace = false;
         document.getElementById('shop-ui').classList.add('hidden');
         
+        setupRace(false);
+    }
+
+    function startCareerRace() {
+        isCustomRace = false;
+        isCareerRace = true;
+        document.getElementById('career-ui').classList.add('hidden');
+
         setupRace(false);
     }
 
@@ -578,9 +702,10 @@
             let names = ["Speedy Pete", "Fast John", "Wild Bill", "Coyote", "Dusty", "Bullet"];
             let name1 = names[Math.floor(Math.random() * names.length)];
             let name2 = names[Math.floor(Math.random() * names.length)];
-            let animKeys = Object.keys(ANIMAL_TYPES);
-            let anim1 = animKeys[Math.floor(Math.random() * animKeys.length)];
-            let anim2 = animKeys[Math.floor(Math.random() * animKeys.length)];
+            // Don't include vehicles in custom races
+            let validAnimals = Object.keys(ANIMAL_TYPES).filter(k => !ANIMAL_TYPES[k].isVehicle);
+            let anim1 = validAnimals[Math.floor(Math.random() * validAnimals.length)];
+            let anim2 = validAnimals[Math.floor(Math.random() * validAnimals.length)];
 
             tourney = {
                 name: "Custom Race", length: customTrackLength,
@@ -589,6 +714,9 @@
                     { name: name2, anim: anim2, color: '#f8bbd0', riderColor: '#3e2723', baseSpeed: 8000 * customDifficulty, perfChance: 0.2 * customDifficulty }
                 ]
             };
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            tourney = careerTournaments[tIndex];
         } else {
             let tIndex = Math.min(currentTourney, tournaments.length - 1);
             tourney = tournaments[tIndex];
@@ -613,44 +741,59 @@
             });
         }
         
-        // Combine Base Mount Stats + Upgrades + Rider Stats
-        let anim = ANIMAL_TYPES[selectedAnimal];
-        let riderInfo = RIDER_TYPES[selectedRider];
-        let playerMaxSpeed = anim.spd + (upgrades.speed * 800) + riderInfo.spdBonus;
-        let playerAccel = anim.acc + (upgrades.accel * 250) + riderInfo.accBonus;
-        let playerAssist = 1.0 + (upgrades.assist * 0.15); 
-        let pStamDrain = Math.max(0.5, anim.drain - (upgrades.stamina * 0.2) + riderInfo.drainBonus);
-        let pStamRegen = anim.reg + (upgrades.stamina * 0.1) + riderInfo.regBonus;
+        // Setup Player Stats
+        let animKey = isCareerRace ? 'human' : selectedAnimal;
+        let riderKey = isCareerRace ? 'default' : selectedRider;
+        let anim = ANIMAL_TYPES[animKey];
+        let riderInfo = RIDER_TYPES[riderKey];
 
-        // Match opponent mounts to the player's current mount in tournaments
-        // If it's a Custom Race, we keep the random anim types generated earlier.
-        let ai1AnimType = isCustom ? tourney.ai[0].anim : selectedAnimal;
-        let ai2AnimType = isCustom ? tourney.ai[1].anim : selectedAnimal;
+        let upgSource = isCareerRace ? careerUpgrades : upgrades;
 
-        // Scale opponents dynamically to the player's total top speed.
-        // For custom races, base it on difficulty.
-        // For tournaments, base it on the tournament tier (currentTourney) so early ones are easy.
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let tMultiplier1 = isCustom ? (0.95 + (0.10 * customDifficulty)) : (0.75 + (0.05 * tIndex));
-        let tMultiplier2 = isCustom ? (0.85 + (0.10 * customDifficulty)) : (0.70 + (0.05 * tIndex));
+        let playerMaxSpeed = anim.spd + (upgSource.speed * 800) + riderInfo.spdBonus;
+        let playerAccel = anim.acc + (upgSource.accel * 250) + riderInfo.accBonus;
+        let playerAssist = 1.0 + (upgSource.assist * 0.15);
+        let pStamDrain = Math.max(0.5, anim.drain - (upgSource.stamina * 0.2) + riderInfo.drainBonus);
+        let pStamRegen = anim.reg + (upgSource.stamina * 0.1) + riderInfo.regBonus;
 
-        let ai1BaseSpeed = playerMaxSpeed * tMultiplier1;
-        let ai2BaseSpeed = playerMaxSpeed * tMultiplier2;
+        // Setup Opponents
+        let ai1AnimType, ai2AnimType, ai1BaseSpeed, ai2BaseSpeed, ai1PerfChance, ai2PerfChance;
 
-        // Add a slight variance based on AI's anim spd so they aren't identical
-        ai1BaseSpeed += (ANIMAL_TYPES[ai1AnimType].spd * 0.1);
-        ai2BaseSpeed += (ANIMAL_TYPES[ai2AnimType].spd * 0.1);
+        if (isCareerRace) {
+            // In Career, opponents have fixed stats from the tournament definition, but scale based on difficulty tier directly
+            ai1AnimType = tourney.ai[0].anim;
+            ai2AnimType = tourney.ai[1].anim;
+            ai1BaseSpeed = tourney.ai[0].baseSpeed;
+            ai2BaseSpeed = tourney.ai[1].baseSpeed;
+            ai1PerfChance = tourney.ai[0].perfChance;
+            ai2PerfChance = tourney.ai[1].perfChance;
+        } else {
+            // Match opponent mounts to the player's current mount in standard tournaments
+            ai1AnimType = isCustom ? tourney.ai[0].anim : selectedAnimal;
+            ai2AnimType = isCustom ? tourney.ai[1].anim : selectedAnimal;
 
-        // Adjust perfChance (timing ability) based on early tournament progression so they miss often early on
-        let ai1PerfChance = isCustom ? tourney.ai[0].perfChance : Math.min(0.9, 0.2 + (tIndex * 0.2));
-        let ai2PerfChance = isCustom ? tourney.ai[1].perfChance : Math.min(0.85, 0.15 + (tIndex * 0.2));
+            // Scale standard opponents dynamically to the player's total top speed.
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            let tMultiplier1 = isCustom ? (0.95 + (0.10 * customDifficulty)) : (0.75 + (0.05 * tIndex));
+            let tMultiplier2 = isCustom ? (0.85 + (0.10 * customDifficulty)) : (0.70 + (0.05 * tIndex));
+
+            ai1BaseSpeed = playerMaxSpeed * tMultiplier1;
+            ai2BaseSpeed = playerMaxSpeed * tMultiplier2;
+
+            // Add a slight variance based on AI's anim spd so they aren't identical
+            ai1BaseSpeed += (ANIMAL_TYPES[ai1AnimType].spd * 0.1);
+            ai2BaseSpeed += (ANIMAL_TYPES[ai2AnimType].spd * 0.1);
+
+            // Adjust perfChance (timing ability) based on early tournament progression so they miss often early on
+            ai1PerfChance = isCustom ? tourney.ai[0].perfChance : Math.min(0.9, 0.2 + (tIndex * 0.2));
+            ai2PerfChance = isCustom ? tourney.ai[1].perfChance : Math.min(0.85, 0.15 + (tIndex * 0.2));
+        }
 
         racers = [
             { id: 'ai1', isPlayer: false, name: tourney.ai[0].name, animType: ai1AnimType, color: tourney.ai[0].color, riderColor: tourney.ai[0].riderColor, riderShape: 'normal',
               y: height - 140, scale: ANIMAL_TYPES[ai1AnimType].scale * 0.75, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: ai1BaseSpeed,
               phase: Math.random(), stamina: 100, perfChance: ai1PerfChance, finished: false, finishTime: 0 },
             
-            { id: 'player', isPlayer: true, name: "You", animType: selectedAnimal, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
+            { id: 'player', isPlayer: true, name: "You", animType: animKey, color: anim.color, riderColor: riderInfo.color, riderShape: riderInfo.shape,
               y: height - 100, scale: anim.scale * 1.0, dist: 0, speed: 0, targetSpeed: 0, maxSpeed: playerMaxSpeed,
               accel: playerAccel, assist: playerAssist, stamDrain: pStamDrain, stamRegen: pStamRegen,
               phase: 0, stamina: 100, flashTimer: 0, finished: false, finishTime: 0 },
@@ -710,8 +853,16 @@
         if (gameState !== 'RACE') return;
         
         let allFinished = true;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        let trackLength;
+        if (isCustomRace) {
+            trackLength = customTrackLength;
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            trackLength = careerTournaments[tIndex].length;
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            trackLength = tournaments[tIndex].length;
+        }
         
         let playerRacer = racers.find(r => r.isPlayer);
         let anyMoving = false;
@@ -875,6 +1026,15 @@
             if (playerPos === 1) prize = Math.floor(basePrize * customDifficulty * 2);
             else if (playerPos === 2) prize = Math.floor(basePrize * customDifficulty * 0.5);
             else prize = Math.floor(basePrize * customDifficulty * 0.2);
+            money += prize;
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            if (playerPos === 1) prize = careerTournaments[tIndex].prize;
+            else if (playerPos === 2) prize = Math.floor(careerTournaments[tIndex].prize * 0.3);
+            else prize = Math.floor(careerTournaments[tIndex].prize * 0.1);
+
+            if (playerPos === 1 && currentCareerTourney < careerTournaments.length - 1) currentCareerTourney++;
+            careerMoney += prize;
         } else {
             let tIndex = Math.min(currentTourney, tournaments.length - 1);
             if (playerPos === 1) prize = tournaments[tIndex].prize;
@@ -882,15 +1042,32 @@
             else prize = Math.floor(tournaments[tIndex].prize * 0.1);
 
             if (playerPos === 1 && currentTourney < tournaments.length - 1) currentTourney++;
+            money += prize;
         }
         
         document.getElementById('prize-display').innerText = prize;
-        money += prize;
+
+        let returnBtn = document.getElementById('results-return-btn');
+        if (returnBtn) {
+            if (isCareerRace) {
+                returnBtn.innerText = "Return to Career Locker Room";
+            } else {
+                returnBtn.innerText = "Return to Stables";
+            }
+        }
+    }
+
+    function handleRaceReturn() {
+        if (isCareerRace) {
+            openCareerMenu();
+        } else {
+            openShop();
+        }
     }
 
     // --- RENDERING ---
     function render() {
-        if (gameState === 'SHOP') return; 
+        if (gameState === 'SHOP' || gameState === 'CAREER_MENU') return;
         
         ctx.save();
         ctx.translate(cameraShake.x, cameraShake.y);
@@ -898,8 +1075,16 @@
         ctx.clearRect(0, 0, width, height);
         
         let playerDist = racers.find(r => r.isPlayer)?.dist || 0;
-        let tIndex = Math.min(currentTourney, tournaments.length - 1);
-        let trackLength = isCustomRace ? customTrackLength : tournaments[tIndex].length;
+        let trackLength;
+        if (isCustomRace) {
+            trackLength = customTrackLength;
+        } else if (isCareerRace) {
+            let tIndex = Math.min(currentCareerTourney, careerTournaments.length - 1);
+            trackLength = careerTournaments[tIndex].length;
+        } else {
+            let tIndex = Math.min(currentTourney, tournaments.length - 1);
+            trackLength = tournaments[tIndex].length;
+        }
 
         drawEnvironment(playerDist);
         drawFinishLine(playerDist, trackLength);
@@ -1098,6 +1283,142 @@
         let runStyle = animTypeInfo.runStyle || 'gallop';
         let bounce = 0; let pitch = 0;
         let fb, nb, ff, nf;
+
+        // Vehicle Drawing Check
+        let isVehicle = runStyle.startsWith('vehicle') || runStyle.startsWith('aircraft');
+
+        if (isVehicle) {
+            // Draw Vehicles & Aircrafts
+            let vBounce = isMoving ? Math.sin(cycle * 4) * 2 * s : 0;
+            let drawX = pX;
+            let drawY = pY - (20 * s) - vBounce;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.beginPath(); ctx.ellipse(pX, pY, 40 * s, 8 * s, 0, 0, Math.PI*2); ctx.fill();
+
+            if (runStyle === 'vehicle_slow' || runStyle === 'vehicle_bike' || runStyle === 'vehicle_car') {
+                // Wheels
+                let wRot = isMoving ? diff * 0.1 : 0;
+                ctx.fillStyle = '#111';
+                // Back Wheel
+                ctx.beginPath(); ctx.arc(drawX - 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill();
+                // Front Wheel
+                ctx.beginPath(); ctx.arc(drawX + 20*s, pY - 10*s, 10*s, 0, Math.PI*2); ctx.fill();
+
+                // Hubcaps
+                ctx.fillStyle = '#ccc';
+                ctx.beginPath(); ctx.arc(drawX - 20*s + Math.cos(wRot)*3*s, pY - 10*s + Math.sin(wRot)*3*s, 3*s, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(drawX + 20*s + Math.cos(wRot)*3*s, pY - 10*s + Math.sin(wRot)*3*s, 3*s, 0, Math.PI*2); ctx.fill();
+
+                // Body
+                ctx.fillStyle = racer.color;
+                if (runStyle === 'vehicle_car') {
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 35*s, pY - 10*s);
+                    ctx.lineTo(drawX - 35*s, drawY - 10*s);
+                    ctx.lineTo(drawX - 10*s, drawY - 25*s);
+                    ctx.lineTo(drawX + 15*s, drawY - 25*s);
+                    ctx.lineTo(drawX + 35*s, drawY - 5*s);
+                    ctx.lineTo(drawX + 35*s, pY - 10*s);
+                    ctx.fill();
+                    // Window
+                    ctx.fillStyle = '#81d4fa';
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 5*s, drawY - 10*s);
+                    ctx.lineTo(drawX - 5*s, drawY - 20*s);
+                    ctx.lineTo(drawX + 10*s, drawY - 20*s);
+                    ctx.lineTo(drawX + 20*s, drawY - 10*s);
+                    ctx.fill();
+                } else if (runStyle === 'vehicle_bike') {
+                    ctx.fillRect(drawX - 25*s, drawY, 50*s, 15*s);
+                    ctx.fillStyle = '#eee';
+                    ctx.fillRect(drawX + 10*s, drawY - 15*s, 5*s, 20*s);
+                    ctx.fillStyle = '#111';
+                    ctx.fillRect(drawX + 5*s, drawY - 15*s, 15*s, 5*s);
+                } else if (runStyle === 'vehicle_slow') {
+                    // Walker/Wheelchair
+                    ctx.strokeStyle = '#eee';
+                    ctx.lineWidth = 4 * s;
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 15*s, pY - 10*s);
+                    ctx.lineTo(drawX - 15*s, drawY - 20*s);
+                    ctx.lineTo(drawX + 15*s, drawY - 20*s);
+                    ctx.lineTo(drawX + 15*s, pY - 10*s);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 15*s, drawY);
+                    ctx.lineTo(drawX + 15*s, drawY);
+                    ctx.stroke();
+                }
+            } else if (runStyle.startsWith('aircraft')) {
+                // Flying height
+                drawY = pY - (60 * s) + Math.sin(diff * 0.05) * 10 * s;
+                ctx.fillStyle = racer.color;
+
+                if (runStyle === 'aircraft_heli') {
+                    // Body
+                    ctx.beginPath(); ctx.ellipse(drawX, drawY, 30*s, 15*s, 0, 0, Math.PI*2); ctx.fill();
+                    // Tail
+                    ctx.fillRect(drawX - 50*s, drawY - 5*s, 30*s, 8*s);
+                    // Rotor blades
+                    ctx.fillStyle = '#aaa';
+                    let rot = (diff * 2) % (Math.PI * 2);
+                    let bladeL = Math.cos(rot) * 40 * s;
+                    ctx.fillRect(drawX - bladeL, drawY - 20*s, bladeL * 2, 2*s);
+                    ctx.fillRect(drawX - 4*s, drawY - 20*s, 8*s, 5*s);
+                } else if (runStyle === 'aircraft_jet') {
+                    // Body
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 40*s, drawY);
+                    ctx.lineTo(drawX + 40*s, drawY);
+                    ctx.lineTo(drawX + 20*s, drawY - 10*s);
+                    ctx.lineTo(drawX - 40*s, drawY - 10*s);
+                    ctx.fill();
+                    // Wing
+                    ctx.fillStyle = darkenColor(racer.color, 40);
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 10*s, drawY - 5*s);
+                    ctx.lineTo(drawX - 30*s, drawY - 25*s);
+                    ctx.lineTo(drawX + 10*s, drawY - 5*s);
+                    ctx.fill();
+                    // Thrust
+                    if (isMoving) {
+                        ctx.fillStyle = '#ff5722';
+                        ctx.beginPath(); ctx.arc(drawX - 45*s - (Math.random()*10*s), drawY - 5*s, 5*s, 0, Math.PI*2); ctx.fill();
+                    }
+                } else if (runStyle === 'aircraft_rocket') {
+                    // Body
+                    ctx.beginPath();
+                    ctx.moveTo(drawX - 30*s, drawY + 10*s);
+                    ctx.lineTo(drawX + 30*s, drawY + 10*s);
+                    ctx.lineTo(drawX + 50*s, drawY);
+                    ctx.lineTo(drawX + 30*s, drawY - 10*s);
+                    ctx.lineTo(drawX - 30*s, drawY - 10*s);
+                    ctx.fill();
+                    // Fins
+                    ctx.fillStyle = '#f44336';
+                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 10*s); ctx.lineTo(drawX - 40*s, drawY - 30*s); ctx.lineTo(drawX - 10*s, drawY - 10*s); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY + 10*s); ctx.lineTo(drawX - 40*s, drawY + 30*s); ctx.lineTo(drawX - 10*s, drawY + 10*s); ctx.fill();
+                    // Flame
+                    if (isMoving) {
+                        ctx.fillStyle = '#ffeb3b';
+                        ctx.beginPath(); ctx.moveTo(drawX - 30*s, drawY - 5*s); ctx.lineTo(drawX - 60*s - (Math.random()*20*s), drawY); ctx.lineTo(drawX - 30*s, drawY + 5*s); ctx.fill();
+                    }
+                }
+            }
+
+            // Name Tag
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${14*s}px Georgia`;
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'black'; ctx.shadowBlur = 4;
+            ctx.fillText(racer.name, pX, pY - (80*s));
+            ctx.shadowBlur = 0;
+            ctx.textAlign = 'left';
+
+            return; // Skip organic drawing
+        }
 
         if (runStyle === 'gallop') {
             // Realistic horse gallop (4-beat or 3-beat feel)
